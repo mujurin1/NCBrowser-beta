@@ -1,15 +1,17 @@
+import { getNicoApiUseToken } from "./_common";
+
 /**
  * ニコ生API OAuth Tokenを取得する関数\
  * APIを利用する前にセットしてください
  */
 export function setNicoApiUseToken(fn: () => string) {
-  getNicoApiUseToken = fn;
+  getNicoApiUseToken.get = fn;
 }
-export let getNicoApiUseToken: () => string;
 
 /**
  * `False`なら例外を出す
- * @param condition
+ * @param name 例外時に出す名前
+ * @param body `NiconamaApiResponseBody`
  */
 export function assertNiconamaResponse(
   name: string,

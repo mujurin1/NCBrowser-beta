@@ -1,18 +1,28 @@
-import { getNicoApiUseToken, NiconamaApiResponseBody } from "./common";
+import { NiconamaApiResponseBody } from "./common";
 
 /**
  * このプロジェクト内部でのみ利用するもの
  */
+
+/** ニコ生APIドメイン */
+const API_DOMAIN = "https://api.live2.nicovideo.jp/";
 
 /** 絶対に必須なヘッダー */
 const defaultHeader = {
   "Content-type": "application/json",
 };
 
+/**
+ * ニコ生APIを取得するための関数
+ */
+export const getNicoApiUseToken: {
+  get: () => string;
+} = { get: () => "" };
+
 /** トークンが必要な場合に必須なヘッダー */
 const tokenHeader = () => ({
   ...defaultHeader,
-  Authorization: `Bearer ${getNicoApiUseToken()}`,
+  Authorization: `Bearer ${getNicoApiUseToken.get()}`,
 });
 
 /**
@@ -32,7 +42,7 @@ export function fetchApiRequest(
 ): Promise<NiconamaApiResponseBody> {
   const url = concatQuery(baseUrl, query);
 
-  return fetch(url, {
+  return fetch(`${API_DOMAIN}${url}`, {
     method: method,
     headers: useToken ? tokenHeader() : defaultHeader,
     body: JSON.stringify(body),
@@ -54,7 +64,7 @@ export function fetchNOAuthApiRequest(
   useToken: boolean
 ): Promise<NiconamaApiResponseBody> {
   const headers: any = useToken
-    ? { Authorization: `Bearer ${getNicoApiUseToken()}` }
+    ? { Authorization: `Bearer ${getNicoApiUseToken.get()}` }
     : {};
   return fetch(baseUrl, { method, headers })
     .then((res) => res.text())

@@ -1,5 +1,5 @@
 {
-  "name": "@ncb/niconama-api",
+  "name": "@ncb/ncbrowser-definition",
   "version": "0.0.1",
   "description": "",
   "private": true,
@@ -25,5 +25,8 @@
       "prettier --write './src/**/*.ts'"
     ]
   },
-  "main": "src/index.ts"
+  "main": "src/index.ts",
+  "dependencies": {
+    "@ncbrowser-alpha/common": "file:../Common"
+  }
 }

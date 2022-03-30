@@ -38,7 +38,7 @@ const requestUrl =
 
 /**
  * 番組を延長します\
- * ユーザー生放送の場合最大360分、チャンネル生放送の場合最大1440分まで延長できます\
+ * ユーザー放送の場合最大360分、チャンネル放送の場合最大1440分まで延長できます\
  * [ニコ生ワークショップ](https://github.com/niconamaworkshop/api/blob/master/oauth/_PUT_unama_programs_extension.md)
  */
 export function NiconamaPutUnamaProgramsExtension({

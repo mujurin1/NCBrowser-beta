@@ -38,6 +38,8 @@
     "@emotion/styled": "^11.8.1",
     "@mui/lab": "^5.0.0-alpha.72",
     "@mui/material": "^5.5.0",
+    "@ncb/common": "file:packages/Common",
+    "@ncb/ncbrowser-definition": "file:packages/NCBrowserDefinition",
     "@ncb/niconama-api": "file:packages/NiconamaApi",
     "@reduxjs/toolkit": "^1.8.0",
     "core-js": "^3.19.2",
@@ -60,6 +62,23 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "prettier --write './src/**/*.ts'"
+    ]
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/__test__/**/*.test.ts"
     ]
   }
 }

@@ -4,11 +4,13 @@
 export * from "./websocket/niconamaCommentWsReceive";
 export * from "./websocket/niconamaSystemWsReceive";
 export * from "./types";
-// API
-export * from "./api/common";
-export * from "./api/GetUnamaProgramsRooms";
-export * from "./api/PutUnamaProgramsExtension";
-export * from "./api/NOAuthGetIdTokens";
+// ニコ生のAPI
+export * from "./niconama-api/common";
+export * from "./niconama-api/GetUnamaProgramsRooms";
+export * from "./niconama-api/PutUnamaProgramsExtension";
+// OAUTH関連のAPI
+export * from "./noauth-api/NOAuthGetIdTokens";
+export * from "./oauthGetServer";
 // WebSocket
 export * from "./websocket/NiconamaCommentWs";
 export * from "./websocket/niconamaCommentWsReceive";

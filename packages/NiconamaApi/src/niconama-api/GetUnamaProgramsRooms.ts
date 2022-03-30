@@ -40,7 +40,7 @@ export interface NiconamaCommentRoom {
   name: string;
 }
 
-const requestUrl = "https://api.live2.nicovideo.jp/api/v1/unama/programs/rooms";
+const requestUrl = "api/v1/unama/programs/rooms";
 
 /**
  * コメントを送受信するために使われる部屋の情報を取得します\

@@ -228,7 +228,7 @@ export type NiconamaEnqueteStateType = Values<typeof NiconamaEnqueteStateType>;
 export const NiconamaContentType = {
   /** 動画 */
   nicovideo: "nicovideo",
-  /** 生放送 */
+  /** 放送 */
   nicolive: "nicolive",
   /** 静画 */
   nicoseiga: "nicoseiga",
