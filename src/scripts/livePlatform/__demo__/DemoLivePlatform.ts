@@ -8,7 +8,7 @@ import {
   LiveViews,
 } from "@ncb/ncbrowser-definition";
 import { nanoid } from "nanoid";
-import { DemoComment } from "./DemoCommen";
+import { DemoComment } from "./DemoComment";
 import { DemoLiveConnect } from "./DemoLiveConnect";
 import { DemoLiveSendComment } from "./DemoLiveSendComment";
 import { DemoUser } from "./DemoUser";
@@ -30,11 +30,12 @@ export class DemoLivePlatform implements Live {
   readonly changeComments = this.#updateComments.asSetOnlyTrigger();
   readonly changeUsers = this.#updateUsers.asSetOnlyTrigger();
 
-  public livePlatformId: typeof DemoLivePlatform.id = DemoLivePlatform.id;
-  public static readonly id = "DemoLivePlatform";
-  public static readonly platformName = "デモ-プラットフォーム";
-  public readonly id = DemoLivePlatform.id;
-  public readonly platformName = DemoLivePlatform.platformName;
+  public livePlatformId: typeof DemoLivePlatform.livePlatformId =
+    DemoLivePlatform.livePlatformId;
+  public static readonly livePlatformId = "DemoPlatform";
+  public static readonly livePlatformName = "デモ配信サイト";
+  public readonly id = DemoLivePlatform.livePlatformId;
+  public readonly livePlatformName = DemoLivePlatform.livePlatformName;
 
   #connecting: boolean = false;
   #liveState?: LiveState;
@@ -48,15 +49,15 @@ export class DemoLivePlatform implements Live {
     return this.#liveState;
   }
 
-  public get views() {
-    return this.#views;
-  }
-
   public constructor() {
     this.#views = {
-      connect: DemoLiveConnect,
-      sendComment: DemoLiveSendComment,
+      connect: () => DemoLiveConnect({ demoLive: this }),
+      sendComment: () => DemoLiveSendComment({ demoLive: this }),
     };
+  }
+
+  public getViews() {
+    return this.#views;
   }
 
   public newComments(plus: number): NcbComment[] {
@@ -131,14 +132,14 @@ const createUser = (userId: string): DemoUser => {
 
 const toNcbUser = (user: DemoUser): NcbUser => ({
   globalId: user.globalId,
-  livePlatformId: DemoLivePlatform.id,
+  livePlatformId: DemoLivePlatform.livePlatformId,
   status: {
     name: user.name,
   },
 });
 const toNcbComment = (comment: DemoComment, user: DemoUser): NcbComment => ({
   globalId: nanoid(),
-  livePlatformId: DemoLivePlatform.id,
+  livePlatformId: DemoLivePlatform.livePlatformId,
   userGlobalId: user.globalId,
   content: {
     text: comment.comment,

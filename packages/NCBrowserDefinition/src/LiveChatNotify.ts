@@ -1,4 +1,4 @@
-import { SetOnlyTrigger } from "@ncbrowser-alpha/common";
+import { SetOnlyTrigger } from "@ncb/common";
 import { NcbComment, NcbUser } from "./index";
 
 /**

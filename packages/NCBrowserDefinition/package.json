@@ -27,6 +27,6 @@
   },
   "main": "src/index.ts",
   "dependencies": {
-    "@ncbrowser-alpha/common": "file:../Common"
+    "@ncb/common": "file:../Common"
   }
 }

@@ -1,4 +1,4 @@
-import { ReadonlyCollection, SetOnlyCollection } from "@ncb/common";
+import { ReadonlyCollection, SetonlyCollection } from "@ncb/common";
 import {
   UpdateVariation,
   NcbComment,
@@ -7,8 +7,8 @@ import {
 import { ChatStore } from "../ChatStore";
 
 export class ChatStoreImpl implements ChatStore {
-  #comments = new SetOnlyCollection<NcbComment>("globalId");
-  #users = new SetOnlyCollection<NcbUser>("globalId");
+  #comments = new SetonlyCollection<NcbComment>((comment) => comment.globalId);
+  #users = new SetonlyCollection<NcbUser>((user) => user.globalId);
 
   public get comments(): ReadonlyCollection<NcbComment> {
     return this.#comments;

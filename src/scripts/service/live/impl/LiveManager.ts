@@ -4,14 +4,13 @@ import {
   UpdateVariation,
   NcbComment,
   NcbUser,
-  LiveViews,
 } from "@ncb/ncbrowser-definition";
 import { Live } from "@ncb/ncbrowser-definition";
+import { ChatStore } from "../ChatStore";
 import { LiveNotify } from "../LiveNotify";
 import { LiveStore } from "../LiveStore";
-import { LiveViewStore } from "../LiveViewStore";
 
-export class LiveManager implements LiveNotify, LiveStore, LiveViewStore {
+export class LiveManager implements LiveNotify, LiveStore {
   /** 放送の配列 */
   readonly #lives: Live[];
   /** 放送のマップ */
@@ -25,27 +24,35 @@ export class LiveManager implements LiveNotify, LiveStore, LiveViewStore {
     [string, UpdateVariation, ...NcbUser[]]
   >();
 
-  public changeState = this.#changeState;
-  public changeComments = this.#changeComments;
-  public changeUsers = this.#changeUsers;
+  changeState = this.#changeState;
+  changeComments = this.#changeComments;
+  changeUsers = this.#changeUsers;
 
   readonly lives: ReadonlyArray<Live>;
 
-  public constructor(lives: Live[]) {
+  public constructor(chatStore: ChatStore, lives: Live[]) {
     this.#lives = [];
     this.#liveMap = {};
     lives.forEach((live) => {
       this.#lives.push(live);
       this.#liveMap[live.livePlatformId] = live;
+      // チャット
+      live.changeUsers.add((variation, ...users) => {
+        console.log("user update");
+        chatStore.changeUsers(variation, ...users);
+        this.#changeUsers.fire(live.livePlatformId, variation, ...users);
+      });
+      live.changeComments.add((variation, ...comments) => {
+        console.log("comment update");
+        chatStore.changeComments(variation, ...comments);
+        this.#changeComments.fire(live.livePlatformId, variation, ...comments);
+      });
     });
+
     this.lives = this.#lives;
   }
 
-  public getLive(livePlatformId: string): Live {
+  getLive(livePlatformId: string): Live {
     return this.#liveMap[livePlatformId];
-  }
-
-  public getViewAll(): LiveViews[] {
-    return this.#lives.map((live) => live.views);
   }
 }

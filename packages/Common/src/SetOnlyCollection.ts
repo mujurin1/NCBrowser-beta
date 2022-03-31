@@ -2,13 +2,13 @@ import { ReadonlyCollection } from "./ReadonlyCollection";
 import { Fn } from "./util";
 
 /**
- * 追加のみできるコレクション\
- * Value(V)の中には`string`のキーを持ったプロパティが必要
+ * 一意のキーを持っている値のコレクション\
+ * 追加・変更のみできる
  */
-export class SetOnlyCollection<V> implements ReadonlyCollection<V> {
-  /** Valueのキーのプロパティ名 */
-  readonly #keyName: string;
-  readonly #array: any[];
+export class SetonlyCollection<V> implements ReadonlyCollection<V> {
+  /** Valueからキーを取得する */
+  readonly #getKey: Fn<[V], string>;
+  readonly #array: V[];
   /**
    * Record<Key, Index>
    */
@@ -21,10 +21,10 @@ export class SetOnlyCollection<V> implements ReadonlyCollection<V> {
 
   /**
    * コンストラクタ
-   * @param keyName `V`に存在するキープロパティ名
+   * @param getKey `V`に存在するキープロパティ名
    */
-  constructor(keyName: string) {
-    this.#keyName = keyName;
+  constructor(getKey: Fn<[V], string>) {
+    this.#getKey = getKey;
     this.#array = [];
     this.#record = {};
   }
@@ -45,18 +45,18 @@ export class SetOnlyCollection<V> implements ReadonlyCollection<V> {
    */
   set(value: V) {
     const anyValue = value as any;
-    const key = anyValue[this.#keyName];
+    const key = this.#getKey(anyValue);
     const index = this.#record[key];
     if (index == null) {
-      this.#array.push(value);
       this.#record[key] = this.#array.length;
+      this.#array.push(value);
     } else {
       this.#array[index] = value;
     }
   }
 
-  filter(fn: Fn<[V], boolean>): SetOnlyCollection<V> {
-    const collection = new SetOnlyCollection<V>(this.#keyName);
+  filter(fn: Fn<[V], boolean>): SetonlyCollection<V> {
+    const collection = new SetonlyCollection<V>(this.#getKey);
     for (const [_, value] of this) {
       if (fn(value)) collection.set(value);
     }
@@ -72,7 +72,7 @@ export class SetOnlyCollection<V> implements ReadonlyCollection<V> {
 
   *[Symbol.iterator](): Iterator<readonly [string, V], any, undefined> {
     for (const value of this.#array) {
-      const key = value[this.#keyName];
+      const key = this.#getKey(value);
       yield [key, value];
     }
   }

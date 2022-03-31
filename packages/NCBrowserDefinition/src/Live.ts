@@ -1,4 +1,4 @@
-import { SetOnlyTrigger } from "@ncbrowser-alpha/common";
+import { SetOnlyTrigger } from "@ncb/common";
 import { LiveState, LiveChatNotify, LiveViews } from "./index";
 
 /**
@@ -12,6 +12,10 @@ export interface Live extends LiveChatNotify {
    * 配信プラットフォームID
    */
   readonly livePlatformId: string;
+  /**
+   * 配信プラットフォーム名
+   */
+  readonly livePlatformName: string;
 
   /**
    * 放送に接続しているか\
@@ -25,9 +29,9 @@ export interface Live extends LiveChatNotify {
   readonly liveState?: LiveState;
 
   /**
-   * 放送のビュー
+   * 放送のビューを返す
    */
-  readonly views: LiveViews;
+  readonly getViews: () => LiveViews;
 
   /**
    * 放送の状態が変更したことを通知する
