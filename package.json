@@ -7,7 +7,8 @@
   "scripts": {
     "test": "jest",
     "build": "webpack",
-    "dev": "webpack --mode=development --env NODE_ENV=development --progress --hot --watch"
+    "dev": "webpack --mode=development --env NODE_ENV=development --progress --hot --watch",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
@@ -53,11 +54,6 @@
     "react-window": "^1.8.6",
     "regenerator-runtime": "^0.13.9",
     "styled-components": "^5.3.3"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged; jest"
-    }
   },
   "lint-staged": {
     "*.{ts,tsx}": [
