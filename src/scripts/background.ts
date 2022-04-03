@@ -24,9 +24,9 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 /** コンテキストメニュークリック時イベント */
-chrome.contextMenus.onClicked.addListener(({ menuItemId, checked }) => {
+chrome.contextMenus.onClicked.addListener(({ menuItemId }) => {
   if (menuItemId === "main-page") {
-    chrome.tabs.create({
+    void chrome.tabs.create({
       url: "./index.html",
     });
   }

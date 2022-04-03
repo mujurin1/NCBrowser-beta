@@ -1,19 +1,14 @@
 import { LiveError } from "@ncb/ncbrowser-definition";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { dep } from "../../service/dep";
 import { VirtualListLayoutManager } from "../components/VirtualList/VirtualListLayoutManager";
 import { CommentView } from "./CommentView";
 import { Connection } from "./Connection";
 import { SendComment } from "./SendComment";
 
-export interface IndexProps {}
-
-export function IndexComponent(props: IndexProps) {
+export function IndexComponent() {
   const liveManager = dep.getChatNotify();
   const [errors, setErrors] = useState<LiveError[]>([]);
-  const [viewSize, setViewSize] = useState({ widht: 800, height: 500 });
-
-  const chatStore = dep.getChatStore();
 
   useEffect(() => {
     const fn = (error: LiveError) => setErrors([...errors, error]);
@@ -21,20 +16,7 @@ export function IndexComponent(props: IndexProps) {
     return () => liveManager.onError.delete(fn);
   }, [liveManager, errors]);
 
-  const layoutManager = useMemo(
-    () => new VirtualListLayoutManager(20, chatStore.comments.length),
-    []
-  );
-
-  const resize = useCallback(
-    (e: Event, height: number | number[]) => {
-      if (typeof height === "number") {
-        setViewSize((size) => ({ ...size, height }));
-        layoutManager.setViewportHeight(height);
-      }
-    },
-    [layoutManager]
-  );
+  const layoutManager = useMemo(() => new VirtualListLayoutManager(20, 0), []);
 
   return (
     <div>
@@ -47,7 +29,9 @@ export function IndexComponent(props: IndexProps) {
       >
         ヘッダービュー
         <br />
-        {`${errors.at(-1)?.livePlatformId}\n${errors.at(-1)?.errorMessage}`}
+        {`${errors.at(-1)?.livePlatformId ?? "(undefined)"}\n${
+          errors.at(-1)?.errorMessage ?? "(undefined)"
+        }`}
       </div>
       <div
         style={{
@@ -65,11 +49,7 @@ export function IndexComponent(props: IndexProps) {
           height: "500px",
         }}
       >
-        <CommentView
-          height={viewSize.height}
-          width={viewSize.widht}
-          layoutManager={layoutManager}
-        />
+        <CommentView height={500} width={800} layoutManager={layoutManager} />
       </div>
       <div
         style={{

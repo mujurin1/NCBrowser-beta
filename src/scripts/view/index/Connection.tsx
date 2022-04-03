@@ -15,12 +15,9 @@ export function Connection() {
 
   const [selectId, setSelectId] = useState(0);
 
-  const changeTab = useCallback(
-    (_, value: number) => {
-      setSelectId(value);
-    },
-    [selectId]
-  );
+  const changeTab = useCallback((_, value: number) => {
+    setSelectId(value);
+  }, []);
 
   const liveTabs = useMemo(
     () =>

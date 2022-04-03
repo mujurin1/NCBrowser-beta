@@ -1,4 +1,5 @@
-import { UpdateVariation, NcbComment } from "@ncb/ncbrowser-definition";
+import { assertNotNullish } from "@ncb/common";
+import { NcbComment, UpdateVariation } from "@ncb/ncbrowser-definition";
 import React, { useEffect } from "react";
 import { dep } from "../../service/dep";
 import {
@@ -24,7 +25,7 @@ export function CommentView(props: CommentViewProps) {
     const handler = (
       livePlatformId: string,
       variation: UpdateVariation,
-      ...updateComments: NcbComment[]
+      ...updateComments: NcbComment[] // eslint-disable-line @typescript-eslint/no-unused-vars
     ) => {
       if (variation === "Add") {
         layoutManager.setRowCount(chatStore.comments.length);
@@ -36,7 +37,7 @@ export function CommentView(props: CommentViewProps) {
     };
     chatNotify.changeComments.add(handler);
     return () => chatNotify.changeComments.delete(handler);
-  }, [chatStore.comments, layoutManager]);
+  }, [chatNotify.changeComments, chatStore.comments, layoutManager]);
 
   return (
     <VirtualListView
@@ -56,9 +57,11 @@ function Row({
 }: RowRenderProps) {
   const chatStore = dep.getChatStore();
 
-  const comment = chatStore.comments.at(index)!;
+  const comment = chatStore.comments.at(index);
+  assertNotNullish(comment);
   const content = comment.content;
-  const user = chatStore.users.get(comment.userGlobalId)!;
+  const user = chatStore.users.get(comment.userGlobalId);
+  assertNotNullish(user);
   const state = user.status;
   return (
     <div key={key} className="list-view-row" style={style}>
@@ -78,6 +81,7 @@ function RowIcon(imgSrc?: string) {
   if (imgSrc == null) return <div className="list-view-row-icon" />;
   else return <img className="list-view-row-icon" src={imgSrc} />;
 }
+
 function RowTime(time: number) {
   const date = new Date(time);
   const h = date.getHours();
