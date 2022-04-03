@@ -4,7 +4,16 @@ import { initialStorageData } from "../StorageData";
 
 export class ChromeLocalStorage implements LocalStorage {
   data = initialStorageData;
-  readonly onUpdated = new Trigger<[string]>();
+  readonly onUpdated = new Trigger();
+
+  constructor() {
+    chrome.storage.onChanged.addListener(async (changes, areaname) => {
+      if (areaname === "local") {
+        await this.load();
+        this.onUpdated.fire();
+      }
+    });
+  }
 
   async save() {
     chrome.storage.local.set({ ...this.data });

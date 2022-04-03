@@ -12,9 +12,8 @@ export interface LocalStorage {
 
   /**
    * データが更新されたら呼ばれる
-   * @params [更新されたキー名]
    */
-  readonly onUpdated: SetOnlyTrigger<[string]>;
+  readonly onUpdated: SetOnlyTrigger;
 
   /**
    * データをストレージに上書きする
