@@ -20,12 +20,20 @@ import { IndexComponent } from "./view/index/Index";
 function init() {
   const chatStore = new ChatStoreImpl();
   const chromeStorage = new ChromeLocalStorage();
-  chromeStorage.load().then(async () => {
+
+  // トークンのセット
+  function setNiconamaToken() {
     setNicoApiUseToken(() => {
       const token = chromeStorage.data.nico.token?.access_token;
       if (token == null) throw new Error("トークンが存在しません");
       return token;
     });
+  }
+
+  // ストレージの初期化
+  chromeStorage.load().then(async () => {
+    setNiconamaToken();
+
     if (chromeStorage.data.nico?.token?.access_token == null) {
       window.open(GetNicoTokenUrl, "get_nico_oauth");
     } else {
@@ -35,6 +43,9 @@ function init() {
       await chromeStorage.save();
     }
   });
+
+  // ストレージが更新されたら
+  chromeStorage.onUpdated.add(setNiconamaToken);
 
   const demoLive = new DemoLive();
   const niconama = new NiconamaLive();
