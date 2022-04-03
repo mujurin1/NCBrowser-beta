@@ -19,12 +19,19 @@ export function IndexComponent() {
   const layoutManager = useMemo(() => new VirtualListLayoutManager(20, 0), []);
 
   return (
-    <div>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <div
         style={{
           backgroundColor: "cyan",
           width: "100%",
-          height: "60px",
+          flex: "0 0 60px",
         }}
       >
         ヘッダービュー
@@ -37,7 +44,7 @@ export function IndexComponent() {
         style={{
           backgroundColor: "salmon",
           width: "100%",
-          height: "100px",
+          flex: "0 0 100px",
         }}
       >
         <Connection />
@@ -46,16 +53,16 @@ export function IndexComponent() {
         style={{
           backgroundColor: "chocolate",
           width: "100%",
-          height: "500px",
+          flex: "1 1 0",
         }}
       >
-        <CommentView height={500} width={800} layoutManager={layoutManager} />
+        <CommentView layoutManager={layoutManager} />
       </div>
       <div
         style={{
           backgroundColor: "orange",
           width: "100%",
-          height: "100px",
+          flex: "0 0 100px",
         }}
       >
         <SendComment />

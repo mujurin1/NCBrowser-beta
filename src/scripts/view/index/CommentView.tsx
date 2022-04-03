@@ -9,8 +9,6 @@ import {
 import { VirtualListLayoutManager } from "../components/VirtualList/VirtualListLayoutManager";
 
 export interface CommentViewProps {
-  height: number;
-  width: number;
   layoutManager: VirtualListLayoutManager;
 }
 
@@ -19,7 +17,6 @@ export function CommentView(props: CommentViewProps) {
   const chatNotify = dep.getChatNotify();
 
   const layoutManager = props.layoutManager;
-  layoutManager.setViewportHeight(props.height);
 
   useEffect(() => {
     const handler = (
@@ -39,14 +36,7 @@ export function CommentView(props: CommentViewProps) {
     return () => chatNotify.changeComments.delete(handler);
   }, [chatNotify.changeComments, chatStore.comments, layoutManager]);
 
-  return (
-    <VirtualListView
-      layoutManager={layoutManager}
-      width={props.width}
-      height={props.height}
-      rowRender={Row}
-    />
-  );
+  return <VirtualListView layoutManager={layoutManager} rowRender={Row} />;
 }
 
 function Row({

@@ -20,8 +20,6 @@ export interface RowRenderProps {
 
 export interface VirtualListViewProps {
   layoutManager: VirtualListLayoutManager;
-  width: number;
-  height: number;
   rowRender: Fn<[RowRenderProps], JSX.Element>;
 }
 
@@ -30,10 +28,22 @@ export function VirtualListView(props: VirtualListViewProps) {
 
   const [layout, setLayout] = useState(layoutManager.listViewLayout);
 
-  // レイアウトの初期化
   useEffect(() => {
-    layoutManager.setViewportHeight(props.height);
-  }, [layoutManager, props.height]);
+    const onResize = () => {
+      const viewport = viewportRef.current;
+      if (viewport === null) return;
+
+      layoutManager.setViewportHeight(viewport.clientHeight);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (viewport === null) return;
+
+    layoutManager.setViewportHeight(viewport.clientHeight);
+  });
 
   // レイアウトの更新
   useLayoutEffect(() => {
@@ -66,15 +76,7 @@ export function VirtualListView(props: VirtualListViewProps) {
   }, [layoutManager, viewportRef]);
 
   return (
-    <div
-      ref={viewportRef}
-      className="list-view"
-      onScroll={onScroll}
-      style={{
-        width: props.width,
-        height: props.height,
-      }}
-    >
+    <div ref={viewportRef} className="list-view" onScroll={onScroll}>
       <div
         className="list-view-scroll"
         style={{ height: layout.scrollHeight }}
