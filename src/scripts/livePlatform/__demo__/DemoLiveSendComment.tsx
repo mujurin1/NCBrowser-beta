@@ -5,6 +5,8 @@ export interface DemoLiveSendCommentProps {
   demoLive: DemoLive;
 }
 
+// 将来使うかもなので
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function DemoLiveSendComment(props: DemoLiveSendCommentProps) {
   return (
     <>

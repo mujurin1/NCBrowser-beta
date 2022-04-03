@@ -1,13 +1,13 @@
-import { Trigger, assert } from "@ncb/common";
+import { assertNotNullish, Trigger } from "@ncb/common";
 import {
+  Live,
+  LiveError,
   LiveState,
-  UpdateVariation,
+  LiveViews,
   NcbComment,
   NcbUser,
-  Live,
-  LiveViews,
+  UpdateVariation,
 } from "@ncb/ncbrowser-definition";
-import { LiveError } from "@ncb/ncbrowser-definition";
 import { nanoid } from "nanoid";
 import { DemoComment } from "./DemoComment";
 import { DemoLiveConnect } from "./DemoLiveConnect";
@@ -18,29 +18,32 @@ import { DemoUser } from "./DemoUser";
  * テスト用デモ配信プラットフォーム
  */
 export class DemoLive implements Live {
-  /** { [globalId]: DemoUser } */
-  #demoUsers: Record<string, DemoUser> = {};
-  /** { [globalId]: DemoComment } */
-  #demoComments: Record<string, DemoComment> = {};
-
-  readonly #updateLiveState = new Trigger<[LiveState]>();
-  readonly #updateComments = new Trigger<[UpdateVariation, ...NcbComment[]]>();
-  readonly #updateUsers = new Trigger<[UpdateVariation, ...NcbUser[]]>();
-  readonly #onError = new Trigger<[LiveError]>();
-
-  readonly updateLiveState = this.#updateLiveState.asSetOnlyTrigger();
-  readonly changeComments = this.#updateComments.asSetOnlyTrigger();
-  readonly changeUsers = this.#updateUsers.asSetOnlyTrigger();
-  readonly onError = this.#onError.asSetOnlyTrigger();
-
   public static readonly livePlatformId = "DemoPlatform";
   public static readonly livePlatformName = "デモ配信サイト";
   readonly livePlatformId = DemoLive.livePlatformId;
   readonly livePlatformName = DemoLive.livePlatformName;
-
-  #connecting: boolean = false;
+  /** { [globalId]: DemoUser } */
+  #demoUsers: Record<string, DemoUser> = {};
+  /** { [globalId]: DemoComment } */
+  #demoComments: Record<string, DemoComment> = {};
+  readonly #updateLiveState = new Trigger<[LiveState]>();
+  readonly updateLiveState = this.#updateLiveState.asSetOnlyTrigger();
+  readonly #updateComments = new Trigger<[UpdateVariation, ...NcbComment[]]>();
+  readonly changeComments = this.#updateComments.asSetOnlyTrigger();
+  readonly #updateUsers = new Trigger<[UpdateVariation, ...NcbUser[]]>();
+  readonly changeUsers = this.#updateUsers.asSetOnlyTrigger();
+  readonly #onError = new Trigger<[LiveError]>();
+  readonly onError = this.#onError.asSetOnlyTrigger();
+  #connecting = false;
   #liveState?: LiveState;
   #views: LiveViews;
+
+  public constructor() {
+    this.#views = {
+      connect: () => DemoLiveConnect({ demoLive: this }),
+      sendComment: () => DemoLiveSendComment({ demoLive: this }),
+    };
+  }
 
   public get connecting() {
     return this.#connecting;
@@ -48,13 +51,6 @@ export class DemoLive implements Live {
 
   public get liveState() {
     return this.#liveState;
-  }
-
-  public constructor() {
-    this.#views = {
-      connect: () => DemoLiveConnect({ demoLive: this }),
-      sendComment: () => DemoLiveSendComment({ demoLive: this }),
-    };
   }
 
   public getViews() {
@@ -113,6 +109,7 @@ function createComment(): DemoComment {
     comment: randomComment(),
   };
 }
+
 function randomComment(): string {
   const text = "テストテキストです";
   const cnt = Math.random() * 10;
@@ -123,7 +120,7 @@ function randomComment(): string {
 
 const createUser = (userId: string): DemoUser => {
   const user = demoUsers.find((user) => user.id === userId);
-  assert(user != null);
+  assertNotNullish(user);
   return {
     globalId: nanoid(),
     innerId: user.id,

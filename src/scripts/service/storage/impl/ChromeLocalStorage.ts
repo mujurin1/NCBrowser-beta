@@ -15,8 +15,8 @@ export class ChromeLocalStorage implements LocalStorage {
     });
   }
 
-  async save() {
-    chrome.storage.local.set({ ...this.data });
+  save() {
+    return chrome.storage.local.set({ ...this.data });
   }
 
   async load() {

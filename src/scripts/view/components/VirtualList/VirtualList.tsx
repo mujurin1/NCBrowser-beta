@@ -56,17 +56,14 @@ export function VirtualListView(props: VirtualListViewProps) {
 
     layoutManager.onScroll.add(handler);
     return () => layoutManager.onScroll.delete(handler);
-  }, [viewportRef]);
+  }, [layoutManager.onScroll, viewportRef]);
 
-  const onScroll = useCallback(
-    (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
-      const viewport = viewportRef.current;
-      if (viewport === null || viewport.scrollTop === layoutManager.scrollTop)
-        return;
-      layoutManager.setScrollPosition(viewport.scrollTop);
-    },
-    [layoutManager, viewportRef]
-  );
+  const onScroll = useCallback(() => {
+    const viewport = viewportRef.current;
+    if (viewport === null || viewport.scrollTop === layoutManager.scrollTop)
+      return;
+    layoutManager.setScrollPosition(viewport.scrollTop);
+  }, [layoutManager, viewportRef]);
 
   return (
     <div
@@ -115,7 +112,7 @@ function _Lineup(props: LineupProps) {
       ]);
     }
     layoutManager.changeRowHeight(newValues);
-  }, [linenupRef, props.rowLayouts]);
+  }, [layoutManager, linenupRef, props.rowLayouts]);
 
   return (
     <div ref={linenupRef} className="list-view-lineup">
