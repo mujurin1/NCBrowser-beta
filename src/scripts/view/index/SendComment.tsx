@@ -7,19 +7,14 @@ const tabStyle = {
   height: "30px",
 };
 
-export interface SendCommentProps {}
-
-export function SendComment(props: SendCommentProps) {
+export function SendComment() {
   const liveStore = dep.getLiveStore();
 
   const [selectId, setSelectId] = useState(0);
 
-  const changeTab = useCallback(
-    (_, value: number) => {
-      setSelectId(value);
-    },
-    [selectId]
-  );
+  const changeTab = useCallback((_, value: number) => {
+    setSelectId(value);
+  }, []);
 
   const liveTabs = useMemo(
     () =>

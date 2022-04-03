@@ -1,4 +1,4 @@
-import { Trigger, assert } from "@ncb/common";
+import { assertNotNullish, Trigger } from "@ncb/common";
 
 /* ListView 表示されるビュー
  * Row      リストの行
@@ -46,24 +46,14 @@ export class VirtualListLayoutManager {
   #viewportHeight = 0;
   /** スクロール位置 */
   #scrollTop = 0;
-  /** スクロール位置 */
-  public get scrollTop() {
-    return this.#scrollTop;
-  }
   /** 自動スクロール */
-  #autoScroll: boolean = true;
-
+  #autoScroll = true;
   /** 行の最小幅.デフォルトの高さとしても利用する */
   #minHeight: number;
   /** アイテムのレイアウトの配列 */
   #itemLayouts: ItemLayout[] = [];
   /** リストビュー全体のレイアウト */
   #listViewLayout: ListViewLayout;
-  /** リストビュー全体のレイアウト */
-  public get listViewLayout() {
-    return this.#listViewLayout;
-  }
-
   readonly #onScroll = new Trigger<[number]>();
   /**
    * スクロール位置が変更されたら呼ばれる
@@ -96,6 +86,16 @@ export class VirtualListLayoutManager {
     };
 
     this.recomputeListViewLayout(true, this.#autoScroll);
+  }
+
+  /** スクロール位置 */
+  public get scrollTop() {
+    return this.#scrollTop;
+  }
+
+  /** リストビュー全体のレイアウト */
+  public get listViewLayout() {
+    return this.#listViewLayout;
   }
 
   /**
@@ -209,7 +209,8 @@ export class VirtualListLayoutManager {
     const lastRowItem =
       this.#listViewLayout.rowLayouts[this.#listViewLayout.visibleRowCount - 1]
         .itemLayout;
-    assert(firstRowItem != null && lastRowItem != null);
+    assertNotNullish(firstRowItem);
+    assertNotNullish(lastRowItem);
 
     let layoutMayBeSame = false;
     // スクロールの計算
@@ -249,7 +250,8 @@ export class VirtualListLayoutManager {
     } else if (isAutoScroll === false) {
       this.#autoScroll = false;
     } else {
-      const lastItem = this.#itemLayouts.at(-1)!;
+      const lastItem = this.#itemLayouts.at(-1);
+      assertNotNullish(lastItem);
       this.#autoScroll =
         lastItem.style.top + lastItem.style.minHeight - this.#viewportHeight <=
         this.#scrollTop;

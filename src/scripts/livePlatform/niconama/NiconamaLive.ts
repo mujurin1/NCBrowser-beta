@@ -1,4 +1,4 @@
-import { Trigger } from "@ncb/common";
+import { assertNotNullish, Trigger } from "@ncb/common";
 import {
   Live,
   LiveState,
@@ -86,7 +86,8 @@ export class NiconamaLive implements Live {
       return;
     }
     // assertNiconamaResponse("NiconamaLivePlatform.connectLive", { meta, data });
-    this.#rooms = data!;
+    assertNotNullish(data);
+    this.#rooms = data;
 
     this.#niconamaCommentWs = new NiconamaCommentWs(this.#rooms[0]);
     this.#niconamaCommentWs.onOpenCall = this.onOpen.bind(this);
@@ -107,7 +108,8 @@ export class NiconamaLive implements Live {
    * ニコ生コメント用ウェブソケットが開通したら呼ばれる
    */
   private onOpen() {
-    this.#niconamaCommentWs!.connectLive(100);
+    assertNotNullish(this.#niconamaCommentWs);
+    this.#niconamaCommentWs.connectLive(100);
   }
 
   /**
@@ -127,7 +129,7 @@ export class NiconamaLive implements Live {
     // 新規コメント・新規ユーザー
     const comments: NcbComment[] = [];
     const users: NcbUser[] = [];
-    for (let chat of chats) {
+    for (const chat of chats) {
       const comment = niconamaChatToComment(chat);
       this.#comments[comment.commentId] = comment;
       let user = this.#users[comment.commentId];

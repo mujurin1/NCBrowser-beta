@@ -1,6 +1,16 @@
+import {
+  checkTokenRefresh,
+  GetNicoTokenUrl,
+  setNicoApiUseToken,
+} from "@ncb/niconama-api";
+import { DemoLive } from "../livePlatform/__demo__/DemoLive";
+import { NiconamaLive } from "../livePlatform/niconama/NiconamaLive";
 import { ChatStore } from "./live/ChatStore";
+import { ChatStoreImpl } from "./live/impl/ChatStoreImpl";
+import { LiveManager } from "./live/impl/LiveManager";
 import { LiveNotify } from "./live/LiveNotify";
 import { LiveStore } from "./live/LiveStore";
+import { ChromeLocalStorage } from "./storage/impl/ChromeLocalStorage";
 import { LocalStorage } from "./storage/LocalStorage";
 
 export function singleton<T>(fn: () => T): () => T {
@@ -8,10 +18,57 @@ export function singleton<T>(fn: () => T): () => T {
   return () => instance ?? (instance = fn());
 }
 
-/** サービスの管理者 */
-export const dep: {
-  getStorage: () => LocalStorage;
-  getChatStore: () => ChatStore;
-  getChatNotify: () => LiveNotify;
-  getLiveStore: () => LiveStore;
-} = {} as any;
+export type Provider<T> = () => T;
+
+/** サービスの依存関係定義 */
+const getChatStore: Provider<ChatStore> = singleton(() => new ChatStoreImpl());
+
+const getStorage: Provider<LocalStorage> = singleton(() => {
+  const storage = new ChromeLocalStorage();
+
+  // トークンのセット
+  function setNiconamaToken() {
+    setNicoApiUseToken(() => {
+      const token = storage.data.nico.token?.access_token;
+      if (token == null) throw new Error("トークンが存在しません");
+      return token;
+    });
+  }
+
+  // ストレージの初期化
+  void storage.load().then(async () => {
+    setNiconamaToken();
+
+    if (storage.data.nico?.token?.access_token == null) {
+      window.open(GetNicoTokenUrl, "get_nico_oauth");
+    } else {
+      storage.data.nico.token = await checkTokenRefresh(
+        storage.data.nico.token
+      );
+      await storage.save();
+    }
+  });
+
+  // ストレージが更新されたら
+  storage.onUpdated.add(setNiconamaToken);
+
+  return storage;
+});
+
+const getLiveManager: Provider<LiveManager> = singleton(() => {
+  const chatStore = getChatStore();
+  const demoLive = new DemoLive();
+  const niconama = new NiconamaLive();
+  return new LiveManager(chatStore, [demoLive, niconama]);
+});
+
+const getLiveStore: Provider<LiveStore> = getLiveManager;
+
+const getChatNotify: Provider<LiveNotify> = getLiveManager;
+
+export const dep = {
+  getChatStore,
+  getStorage,
+  getLiveStore,
+  getChatNotify,
+};

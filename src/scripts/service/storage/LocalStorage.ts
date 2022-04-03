@@ -1,4 +1,4 @@
-import { SetOnlyTrigger, Trigger } from "@ncb/common";
+import { SetOnlyTrigger } from "@ncb/common";
 import { StorageData } from "./StorageData";
 
 /**
