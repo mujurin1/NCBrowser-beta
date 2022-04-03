@@ -21,8 +21,7 @@ export class NiconamaCommentWs {
   static readonly #tsCommentPingContent: string = "Ts";
 
   /**
-   * 接続中のWebSocket\
-   * readyState: [`CONNECTING`,`OPEN`,`CLOSING`,`CLOSED`]
+   * 接続中のWebSocket
    */
   #ws: WebSocket;
   /**
@@ -39,38 +38,63 @@ export class NiconamaCommentWs {
   /** 部屋情報 */
   public readonly room: NiconamaCommentRoom;
 
-  /** 接続しているか */
-  public get connecting(): boolean {
-    return this.#ws.readyState === 1;
+  /**
+   * 接続状態\
+   * [`CONNECTING`,`OPEN`,`CLOSING`,`CLOSED`]
+   */
+  public get readyState(): number {
+    return this.#ws.readyState;
   }
+
+  /** 接続時に呼ばれる */
+  public onOpenCall: () => void = () => {};
+  /** エラー発生時に呼ばれる */
+  public onErrorCall: () => void = () => {};
+  /** 切断時に呼ばれる */
+  public onCloseCall: () => void = () => {};
+
   /** コメント受信時に呼ばれる */
-  public onReceiveChat: (...chats: NiconamaChat[]) => void;
+  public onReceiveChat: (...chats: NiconamaChat[]) => void = () => {};
   /** スレッド受信時に呼ばれる */
-  public onReceiveThread?: (thread: NiconamaCommentReceiveThread) => void;
+  public onReceiveThread: (thread: NiconamaCommentReceiveThread) => void =
+    () => {};
 
   /**
    * コンストラクタ
    * @param room 接続部屋情報
-   * @param receiveChat チャットを受信した時のコールバック関数
    */
-  public constructor(
-    room: NiconamaCommentRoom,
-    receiveChat: (...chats: NiconamaChat[]) => void
-  ) {
+  public constructor(room: NiconamaCommentRoom) {
     this.room = room;
-    this.onReceiveChat = receiveChat;
     this.#ws = new WebSocket(this.room.webSocketUri, ["msg.nicovideo.jp#json"]);
-    this.#ws.onmessage = this.receiveMessage.bind(this);
+    this.#ws.onopen = this.onOpen.bind(this);
+    this.#ws.onmessage = this.onMessage.bind(this);
+    this.#ws.onerror = this.onError.bind(this);
+    this.#ws.onclose = this.onClose.bind(this);
   }
 
-  /**
-   * ウェブソケット開通したら呼ばれる\
-   * すでに開通していたらすぐ呼ばれる
-   * @param fn 呼んでもらう関数
-   */
-  public opendCall(fn: () => void) {
-    if (this.#ws.readyState === 1) fn();
-    else this.#ws.onopen = fn;
+  private onOpen(e: Event) {
+    this.onOpenCall();
+  }
+
+  private onMessage(e: MessageEvent<string>) {
+    const message = JSON.parse(e.data) as NiconamaCommentWsReceiveMessage;
+
+    if ("chat" in message) {
+      this.receiveChat(message.chat);
+    } else if ("ping" in message) {
+      this.receivePing(message.ping);
+    } else if ("thread" in message) {
+      // console.log("thread");
+      // console.log(message.thread);
+    }
+  }
+
+  private onError(e: Event) {
+    this.onErrorCall();
+  }
+
+  private onClose(e: CloseEvent) {
+    this.onCloseCall();
   }
 
   /**
@@ -102,23 +126,6 @@ export class NiconamaCommentWs {
       },
       { ping: { content: NiconamaCommentWs.#liveConnectedPingContent } }
     );
-  }
-
-  /**
-   * ウェブソケットからメッセージを受信
-   * @param e MessageEvent<>
-   */
-  private receiveMessage(e: MessageEvent<string>) {
-    const message = JSON.parse(e.data) as NiconamaCommentWsReceiveMessage;
-
-    if ("chat" in message) {
-      this.receiveChat(message.chat);
-    } else if ("ping" in message) {
-      this.receivePing(message.ping);
-    } else if ("thread" in message) {
-      // console.log("thread");
-      // console.log(message.thread);
-    }
   }
 
   /**
@@ -163,7 +170,7 @@ export class NiconamaCommentWs {
   private sendMessage<T extends NiconamaCommentWsSendMessage>(
     ...messages: T[]
   ) {
-    if (!this.connecting) return;
+    if (this.readyState !== 1) return;
 
     const data = `[${messages.map((x) => JSON.stringify(x))}]`;
     console.log("ニコ生コメントウェブソケット送信", data);

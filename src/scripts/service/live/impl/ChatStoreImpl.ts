@@ -1,4 +1,4 @@
-import { ReadonlyCollection, SetonlyCollection } from "@ncb/common";
+import { SetonlyCollection } from "@ncb/common";
 import {
   UpdateVariation,
   NcbComment,
@@ -7,20 +7,13 @@ import {
 import { ChatStore } from "../ChatStore";
 
 export class ChatStoreImpl implements ChatStore {
-  #comments = new SetonlyCollection<NcbComment>((comment) => comment.globalId);
-  #users = new SetonlyCollection<NcbUser>((user) => user.globalId);
-
-  public get comments(): ReadonlyCollection<NcbComment> {
-    return this.#comments;
-  }
-  public get users(): ReadonlyCollection<NcbUser> {
-    return this.#users;
-  }
+  comments = new SetonlyCollection<NcbComment>((comment) => comment.globalId);
+  users = new SetonlyCollection<NcbUser>((user) => user.globalId);
 
   public changeComments(valiation: UpdateVariation, ...comments: NcbComment[]) {
     if (valiation === "Add" || valiation === "Update") {
       for (const comment of comments) {
-        this.#comments.set(comment);
+        this.comments.set(comment);
       }
     } else if (valiation === "Delete") {
     }
@@ -29,7 +22,7 @@ export class ChatStoreImpl implements ChatStore {
   public changeUsers(valiation: UpdateVariation, ...users: NcbUser[]) {
     if (valiation === "Add" || valiation === "Update") {
       for (const user of users) {
-        this.#users.set(user);
+        this.users.set(user);
       }
     } else if (valiation === "Delete") {
     }

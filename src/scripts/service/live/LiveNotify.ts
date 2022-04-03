@@ -5,6 +5,7 @@ import {
   NcbUser,
   LiveState,
 } from "@ncb/ncbrowser-definition";
+import { LiveError } from "@ncb/ncbrowser-definition";
 
 export type LivePlatformId = string;
 
@@ -31,4 +32,9 @@ export interface LiveNotify {
   readonly changeUsers: SetOnlyTrigger<
     [LivePlatformId, UpdateVariation, ...NcbUser[]]
   >;
+
+  /**
+   * Liveでエラーが発生したことを通知する
+   */
+  readonly onError: SetOnlyTrigger<[LiveError]>;
 }

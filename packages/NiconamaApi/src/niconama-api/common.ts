@@ -1,4 +1,19 @@
+import { NiconamaTokenData } from "../index";
+import { refreshNicoToken } from "../oauthGetServer";
 import { getNicoApiUseToken } from "./_common";
+
+/**
+ * ニコ生API OAuth Tokenをチェック・再取得する\
+ * トークンの寿命の1分前を過ぎていたら再取得する
+ */
+export async function checkTokenRefresh(
+  oauth: NiconamaTokenData
+): Promise<NiconamaTokenData> {
+  if (oauth.time - Date.now() / 1000 <= 60) {
+    return await refreshNicoToken(oauth.refresh_token);
+  }
+  return oauth;
+}
 
 /**
  * ニコ生API OAuth Tokenを取得する関数\

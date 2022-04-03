@@ -1,14 +1,14 @@
 import React from "react";
-import { DemoLivePlatform } from "./DemoLivePlatform";
+import { DemoLive } from "./DemoLive";
 
 export interface DemoLiveSendCommentProps {
-  demoLive: DemoLivePlatform;
+  demoLive: DemoLive;
 }
 
 export function DemoLiveSendComment(props: DemoLiveSendCommentProps) {
   return (
     <>
-      <div>デモライブ コメント送信ビュー</div>
+      <div>デモライブ コメント送信ビュー {Math.random()}</div>
     </>
   );
 }

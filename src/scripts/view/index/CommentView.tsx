@@ -14,8 +14,8 @@ export interface CommentViewProps {
 }
 
 export function CommentView(props: CommentViewProps) {
-  const chatStore = dep.chatStore();
-  const chatNotify = dep.chatNotify();
+  const chatStore = dep.getChatStore();
+  const chatNotify = dep.getChatNotify();
 
   const layoutManager = props.layoutManager;
   layoutManager.setViewportHeight(props.height);
@@ -54,7 +54,7 @@ function Row({
     itemLayout: { index, style },
   },
 }: RowRenderProps) {
-  const chatStore = dep.chatStore();
+  const chatStore = dep.getChatStore();
 
   const comment = chatStore.comments.at(index)!;
   const content = comment.content;
@@ -65,7 +65,7 @@ function Row({
       {/* {`key-${key},i-${index},${chatStore.comments.at(index)?.content?.text}`} */}
       {/* <div className="list-view-row-no">{content.no ?? "--"}</div> */}
       <div className="list-view-row-no">{`inde:${index}-key:${key}`}</div>
-      {RowIcon(state.iconUrl)}
+      {RowIcon(state.userIconUrl)}
       <div className="list-view-row-name">{state.name}</div>
       {RowTime(content.time)}
       {/* <div className="list-view-row-time">{content.time}</div> */}

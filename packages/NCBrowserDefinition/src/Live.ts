@@ -1,5 +1,6 @@
 import { SetOnlyTrigger } from "@ncb/common";
 import { LiveState, LiveChatNotify, LiveViews } from "./index";
+import { LiveError } from "./model/LiveError";
 
 /**
  * 放送
@@ -12,10 +13,16 @@ export interface Live extends LiveChatNotify {
    * 配信プラットフォームID
    */
   readonly livePlatformId: string;
+
   /**
    * 配信プラットフォーム名
    */
   readonly livePlatformName: string;
+
+  /**
+   * エラー発生時に呼ばれる
+   */
+  readonly onError: SetOnlyTrigger<[LiveError]>;
 
   /**
    * 放送に接続しているか\

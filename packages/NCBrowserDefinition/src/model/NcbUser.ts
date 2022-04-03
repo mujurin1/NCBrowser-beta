@@ -17,6 +17,6 @@ export interface NcbUser {
 export interface NcbUserState {
   /** ユーザー名 */
   readonly name: string;
-  /** アイコンURL */
-  readonly iconUrl?: string;
+  /** ユーザーのアイコンURL */
+  readonly userIconUrl?: string;
 }

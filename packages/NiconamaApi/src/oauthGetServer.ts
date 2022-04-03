@@ -20,7 +20,7 @@ export const GetNicoTokenUrl = `${MY_SERVER}/auth`;
 /**
  * ニコニコのトークンを返すページのURL
  */
-export const GetNicoTokenResultUrl = `${MY_SERVER}/oauthCallback?code=`;
+export const NicoTokenResultUrl = `${MY_SERVER}/oauthCallback?code=`;
 
 /**
  * トークンをリフレッシュする
@@ -61,11 +61,13 @@ export function getNiconamaToken(): readonly [
 ] {
   // https://github.com/niconamaworkshop/websocket_api_document/blob/master/pdf/NOAUTH-Tokenendpoint.pdf
   const tokenJson = document.getElementById("token-data")?.innerText;
-  const openIdJson = document.getElementById("user-data")?.innerText;
+  const openIdJson =
+    document.getElementById("user-data")?.innerText ??
+    document.getElementById("user-id")?.innerText;
   if (tokenJson == null || openIdJson == null)
     throw new Error("このページはニコ生トークンがあるページではないです");
 
-  const tokenData: NiconamaTokenData = JSON.parse(tokenJson);
-  const openIdData: NiconamaIdToken = JSON.parse(openIdJson);
-  return [tokenData, openIdData] as const;
+  const token: NiconamaTokenData = JSON.parse(tokenJson);
+  const idToken: NiconamaIdToken = JSON.parse(openIdJson);
+  return [token, idToken] as const;
 }

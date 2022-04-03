@@ -7,6 +7,7 @@ import {
   Live,
   LiveViews,
 } from "@ncb/ncbrowser-definition";
+import { LiveError } from "@ncb/ncbrowser-definition";
 import { nanoid } from "nanoid";
 import { DemoComment } from "./DemoComment";
 import { DemoLiveConnect } from "./DemoLiveConnect";
@@ -16,7 +17,7 @@ import { DemoUser } from "./DemoUser";
 /**
  * テスト用デモ配信プラットフォーム
  */
-export class DemoLivePlatform implements Live {
+export class DemoLive implements Live {
   /** { [globalId]: DemoUser } */
   #demoUsers: Record<string, DemoUser> = {};
   /** { [globalId]: DemoComment } */
@@ -25,17 +26,17 @@ export class DemoLivePlatform implements Live {
   readonly #updateLiveState = new Trigger<[LiveState]>();
   readonly #updateComments = new Trigger<[UpdateVariation, ...NcbComment[]]>();
   readonly #updateUsers = new Trigger<[UpdateVariation, ...NcbUser[]]>();
+  readonly #onError = new Trigger<[LiveError]>();
 
   readonly updateLiveState = this.#updateLiveState.asSetOnlyTrigger();
   readonly changeComments = this.#updateComments.asSetOnlyTrigger();
   readonly changeUsers = this.#updateUsers.asSetOnlyTrigger();
+  readonly onError = this.#onError.asSetOnlyTrigger();
 
-  public livePlatformId: typeof DemoLivePlatform.livePlatformId =
-    DemoLivePlatform.livePlatformId;
   public static readonly livePlatformId = "DemoPlatform";
   public static readonly livePlatformName = "デモ配信サイト";
-  public readonly id = DemoLivePlatform.livePlatformId;
-  public readonly livePlatformName = DemoLivePlatform.livePlatformName;
+  readonly livePlatformId = DemoLive.livePlatformId;
+  readonly livePlatformName = DemoLive.livePlatformName;
 
   #connecting: boolean = false;
   #liveState?: LiveState;
@@ -132,14 +133,14 @@ const createUser = (userId: string): DemoUser => {
 
 const toNcbUser = (user: DemoUser): NcbUser => ({
   globalId: user.globalId,
-  livePlatformId: DemoLivePlatform.livePlatformId,
+  livePlatformId: DemoLive.livePlatformId,
   status: {
     name: user.name,
   },
 });
 const toNcbComment = (comment: DemoComment, user: DemoUser): NcbComment => ({
   globalId: nanoid(),
-  livePlatformId: DemoLivePlatform.livePlatformId,
+  livePlatformId: DemoLive.livePlatformId,
   userGlobalId: user.globalId,
   content: {
     text: comment.comment,

@@ -1,13 +1,14 @@
 import { SetOnlyTrigger, Trigger } from "@ncb/common";
+import { StorageData } from "./StorageData";
 
 /**
- * 拡張機能のローカルに保存されるストレージ
+ * 保存されるデータ
  */
-export interface LocalStorage<T> {
+export interface LocalStorage {
   /**
    * データ
    */
-  readonly data: T;
+  readonly data: StorageData;
 
   /**
    * データが更新されたら呼ばれる
@@ -16,24 +17,13 @@ export interface LocalStorage<T> {
   readonly onUpdated: SetOnlyTrigger<[string]>;
 
   /**
-   * データを上書きする
-   * @param data 新しいデータ
+   * データをストレージに上書きする
    */
-  set(data: T): Promise<void>;
-}
+  save(): Promise<void>;
 
-export class EmptyStorage<T> implements LocalStorage<T> {
-  #onUpdated = new Trigger<[string]>();
-
-  public readonly data: T;
-  public readonly onUpdated: SetOnlyTrigger<[string]> =
-    this.#onUpdated.asSetOnlyTrigger();
-
-  constructor(data: T) {
-    this.data = data;
-  }
-
-  set(data: T): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
+  /**
+   * データをストレージから読み取る\
+   * `this.data`を更新する
+   */
+  load(): Promise<void>;
 }

@@ -1,15 +1,25 @@
-import React, { useCallback, useMemo, useState } from "react";
+import { LiveError } from "@ncb/ncbrowser-definition";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { dep } from "../../service/dep";
 import { VirtualListLayoutManager } from "../components/VirtualList/VirtualListLayoutManager";
 import { CommentView } from "./CommentView";
 import { Connection } from "./Connection";
+import { SendComment } from "./SendComment";
 
 export interface IndexProps {}
 
 export function IndexComponent(props: IndexProps) {
+  const liveManager = dep.getChatNotify();
+  const [errors, setErrors] = useState<LiveError[]>([]);
   const [viewSize, setViewSize] = useState({ widht: 800, height: 500 });
 
-  const chatStore = dep.chatStore();
+  const chatStore = dep.getChatStore();
+
+  useEffect(() => {
+    const fn = (error: LiveError) => setErrors([...errors, error]);
+    liveManager.onError.add(fn);
+    return () => liveManager.onError.delete(fn);
+  }, [liveManager, errors]);
 
   const layoutManager = useMemo(
     () => new VirtualListLayoutManager(20, chatStore.comments.length),
@@ -36,6 +46,8 @@ export function IndexComponent(props: IndexProps) {
         }}
       >
         ヘッダービュー
+        <br />
+        {`${errors.at(-1)?.livePlatformId}\n${errors.at(-1)?.errorMessage}`}
       </div>
       <div
         style={{
@@ -53,16 +65,20 @@ export function IndexComponent(props: IndexProps) {
           height: "500px",
         }}
       >
-        <CommentView height={500} width={800} layoutManager={layoutManager} />
+        <CommentView
+          height={viewSize.height}
+          width={viewSize.widht}
+          layoutManager={layoutManager}
+        />
       </div>
       <div
         style={{
           backgroundColor: "orange",
           width: "100%",
-          height: "60px",
+          height: "100px",
         }}
       >
-        コメント送信ビュー
+        <SendComment />
       </div>
     </div>
   );

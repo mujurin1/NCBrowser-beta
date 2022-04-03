@@ -17,7 +17,13 @@ const defaultHeader = {
  */
 export const getNicoApiUseToken: {
   get: () => string;
-} = { get: () => "" };
+} = {
+  get: () => {
+    throw new Error(
+      "ニコ生APIを利用する前に`setNicoApiUseToken`でAPI取得関数をセットしてください"
+    );
+  },
+};
 
 /** トークンが必要な場合に必須なヘッダー */
 const tokenHeader = () => ({

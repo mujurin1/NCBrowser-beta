@@ -1,4 +1,4 @@
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 import React, { useCallback, useMemo, useState } from "react";
 import { dep } from "../../service/dep";
 
@@ -7,10 +7,9 @@ const tabStyle = {
   height: "30px",
 };
 
-/**
- * 放送に接続するためのビュー
- */
-export function Connection() {
+export interface SendCommentProps {}
+
+export function SendComment(props: SendCommentProps) {
   const liveStore = dep.getLiveStore();
 
   const [selectId, setSelectId] = useState(0);
@@ -48,7 +47,7 @@ export function Connection() {
       </Box>
       {liveStore.lives.map((live, i) => (
         <div key={live.livePlatformId} hidden={selectId !== i}>
-          {live.getViews().connect()}
+          {live.getViews().sendComment()}
         </div>
       ))}
     </>
