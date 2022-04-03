@@ -29,30 +29,28 @@ export function VirtualListView(props: VirtualListViewProps) {
   const [layout, setLayout] = useState(layoutManager.listViewLayout);
 
   useEffect(() => {
-    const onResize = () => {
+    const onWindowResize = () => {
       const viewport = viewportRef.current;
       if (viewport === null) return;
 
       layoutManager.setViewportHeight(viewport.clientHeight);
     };
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+    const onRecomputedLayout = () => setLayout(layoutManager.listViewLayout);
+
+    layoutManager.onRecomputedLayout.add(onRecomputedLayout);
+    window.addEventListener("resize", onWindowResize);
+
+    return () => {
+      layoutManager.onRecomputedLayout.delete(onRecomputedLayout);
+      window.removeEventListener("resize", onWindowResize);
+    };
+  }, [layoutManager]);
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
     if (viewport === null) return;
 
     layoutManager.setViewportHeight(viewport.clientHeight);
   });
-
-  // レイアウトの更新
-  useLayoutEffect(() => {
-    const handler = () => setLayout(layoutManager.listViewLayout);
-    layoutManager.onRecomputedLayout.add(handler);
-    return () => {
-      layoutManager.onRecomputedLayout.delete(handler);
-    };
-  }, [layoutManager]);
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
 
@@ -100,21 +98,32 @@ function _Lineup(props: LineupProps) {
   const layoutManager = props.layoutManager;
   const linenupRef = useRef<HTMLDivElement | null>(null);
 
-  useLayoutEffect(() => {
+  const notifyRowSizes = useCallback(() => {
     const lineup = linenupRef.current;
     if (lineup === null || layoutManager.listViewLayout.visibleRowCount === 0)
       return;
 
     const newValues: [number, number][] = [];
     for (let i = 0; i < layoutManager.listViewLayout.visibleRowCount; i++) {
-      const child = lineup.children[i];
+      const child = lineup.children[i] as HTMLElement;
+      const originalMinHeight = child.style.minHeight;
+      child.style.minHeight = "";
       newValues.push([
         layoutManager.listViewLayout.rowLayouts[0].itemLayout.index + i,
         child.clientHeight,
       ]);
+      child.style.minHeight = originalMinHeight;
     }
     layoutManager.changeRowHeight(newValues);
-  }, [layoutManager, linenupRef, props.rowLayouts]);
+  }, [layoutManager, linenupRef]);
+
+  useEffect(() => {
+    window.addEventListener("resize", notifyRowSizes);
+    return () => window.removeEventListener("resize", notifyRowSizes);
+  }, [notifyRowSizes]);
+  useLayoutEffect(() => {
+    notifyRowSizes();
+  }, [linenupRef, notifyRowSizes, props.rowLayouts]);
 
   return (
     <div ref={linenupRef} className="list-view-lineup">
