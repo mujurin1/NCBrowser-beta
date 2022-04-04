@@ -1,3 +1,4 @@
+import { css } from "@emotion/react";
 import { LiveError } from "@ncb/ncbrowser-definition";
 import React, { useEffect, useMemo, useState } from "react";
 import { dep } from "../../service/dep";
@@ -59,11 +60,11 @@ export function IndexComponent() {
         <CommentView layoutManager={layoutManager} />
       </div>
       <div
-        style={{
-          backgroundColor: "orange",
-          width: "100%",
-          flex: "0 0 100px",
-        }}
+        css={css`
+          background-color: orange;
+          width: 100%;
+          flex: 0 0 100px;
+        `}
       >
         <SendComment />
       </div>
