@@ -10,7 +10,6 @@ export class ChromeLocalStorage implements LocalStorage {
     chrome.storage.onChanged.addListener(async (changes, areaname) => {
       if (areaname === "local") {
         await this.load();
-        this.onUpdated.fire();
       }
     });
   }
@@ -24,5 +23,6 @@ export class ChromeLocalStorage implements LocalStorage {
       ...initialStorageData,
       ...(await chrome.storage.local.get(undefined)),
     };
+    this.onUpdated.fire();
   }
 }

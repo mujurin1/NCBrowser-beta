@@ -1,0 +1,63 @@
+' プレビューは ALT + D
+' 位置指定は A -[hidden]right- B
+
+@startuml 配信プラットフォームからコメントビューへの流れ
+
+interface Live {
+  メモ: ニコ生やツイッチなど配信プラットフォーム
+  changeComments: 変化したコメントを含めて通知する
+  changeUsers: 変化したユーザーを含めて通知する
+  views: 放送接続・コメント送信ビュー
+}
+
+
+' サービス
+interface LiveStore {
+  メモ: 配信プラットフォームを保持するサービス
+  lives: 配信プラットフォーム
+}
+interface ChatStore {
+  メモ: チャットを保持するサービス
+  comments: コメント
+  users: ユーザー
+  changeComments: コメントが変化した事実を通知する
+  changeUsers: ユーザーが変化した事実を通知する
+  changeComments(): コメントを変化する
+  changeUsers(): ユーザーを変化する
+}
+
+Live --o LiveStore
+
+LiveStore --* ConnectLiveView :> 放送接続ビューを渡す
+LiveStore --* SendCommentView :> コメントビューを渡す
+
+ChatStore --* ChatView :> チャットの変更通知\nチャットの読み取り
+
+LiveStore - ChatStore :> Liveから通知された\nチャットを変更する
+
+
+' コメントビューの実装
+class ChatView {
+  メモ: チャットを表示する
+}
+class ConnectLiveView {
+  メモ: 放送へ接続する
+}
+class SendCommentView {
+  メモ: 放送へコメントを送信する
+}
+
+ChatView --o CommentView
+ConnectLiveView --o CommentView
+SendCommentView --o CommentView
+
+class CommentView
+
+
+' その他のサービス
+interface LocalStorage {
+  メモ: ストレージを管理するサービス
+}
+
+
+@enduml

@@ -26,14 +26,18 @@ const getChatStore: Provider<ChatStore> = singleton(() => new ChatStoreImpl());
 const getStorage: Provider<LocalStorage> = singleton(() => {
   const storage = new ChromeLocalStorage();
 
+  // ストレージが更新されたら
+  storage.onUpdated.add(setNiconamaToken);
+
   // トークンのセット
   function setNiconamaToken() {
     setNicoApiUseToken(() => {
-      const token = storage.data.nico.token?.access_token;
+      const token = dep.getStorage().data.nico.token?.access_token;
       if (token == null) throw new Error("トークンが存在しません");
       return token;
     });
   }
+  setNiconamaToken();
 
   // ストレージの初期化
   void storage.load().then(async () => {
@@ -48,9 +52,6 @@ const getStorage: Provider<LocalStorage> = singleton(() => {
       await storage.save();
     }
   });
-
-  // ストレージが更新されたら
-  storage.onUpdated.add(setNiconamaToken);
 
   return storage;
 });
@@ -72,3 +73,5 @@ export const dep = {
   getLiveStore,
   getChatNotify,
 };
+
+getStorage();
