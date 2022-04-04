@@ -18,6 +18,7 @@ module.exports = {
     "space-infix-ops": "error",
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
+    "react/prop-types": "off",
     "react/react-in-jsx-scope": "off",
     "react-hooks/exhaustive-deps": "error",
   },
