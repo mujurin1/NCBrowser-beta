@@ -20,8 +20,6 @@ export interface RowRenderProps {
 
 export interface VirtualListViewProps {
   layoutManager: VirtualListLayoutManager;
-  width: number;
-  height: number;
   rowRender: Fn<[RowRenderProps], JSX.Element>;
 }
 
@@ -30,19 +28,29 @@ export function VirtualListView(props: VirtualListViewProps) {
 
   const [layout, setLayout] = useState(layoutManager.listViewLayout);
 
-  // レイアウトの初期化
   useEffect(() => {
-    layoutManager.setViewportHeight(props.height);
-  }, [layoutManager, props.height]);
+    const onWindowResize = () => {
+      const viewport = viewportRef.current;
+      if (viewport === null) return;
 
-  // レイアウトの更新
-  useLayoutEffect(() => {
-    const handler = () => setLayout(layoutManager.listViewLayout);
-    layoutManager.onRecomputedLayout.add(handler);
+      layoutManager.setViewportHeight(viewport.clientHeight);
+    };
+    const onRecomputedLayout = () => setLayout(layoutManager.listViewLayout);
+
+    layoutManager.onRecomputedLayout.add(onRecomputedLayout);
+    window.addEventListener("resize", onWindowResize);
+
     return () => {
-      layoutManager.onRecomputedLayout.delete(handler);
+      layoutManager.onRecomputedLayout.delete(onRecomputedLayout);
+      window.removeEventListener("resize", onWindowResize);
     };
   }, [layoutManager]);
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (viewport === null) return;
+
+    layoutManager.setViewportHeight(viewport.clientHeight);
+  });
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,15 +74,7 @@ export function VirtualListView(props: VirtualListViewProps) {
   }, [layoutManager, viewportRef]);
 
   return (
-    <div
-      ref={viewportRef}
-      className="list-view"
-      onScroll={onScroll}
-      style={{
-        width: props.width,
-        height: props.height,
-      }}
-    >
+    <div ref={viewportRef} className="list-view" onScroll={onScroll}>
       <div
         className="list-view-scroll"
         style={{ height: layout.scrollHeight }}
@@ -98,21 +98,32 @@ function _Lineup(props: LineupProps) {
   const layoutManager = props.layoutManager;
   const linenupRef = useRef<HTMLDivElement | null>(null);
 
-  useLayoutEffect(() => {
+  const notifyRowSizes = useCallback(() => {
     const lineup = linenupRef.current;
     if (lineup === null || layoutManager.listViewLayout.visibleRowCount === 0)
       return;
 
     const newValues: [number, number][] = [];
     for (let i = 0; i < layoutManager.listViewLayout.visibleRowCount; i++) {
-      const child = lineup.children[i];
+      const child = lineup.children[i] as HTMLElement;
+      const originalMinHeight = child.style.minHeight;
+      child.style.minHeight = "";
       newValues.push([
         layoutManager.listViewLayout.rowLayouts[0].itemLayout.index + i,
         child.clientHeight,
       ]);
+      child.style.minHeight = originalMinHeight;
     }
     layoutManager.changeRowHeight(newValues);
-  }, [layoutManager, linenupRef, props.rowLayouts]);
+  }, [layoutManager, linenupRef]);
+
+  useEffect(() => {
+    window.addEventListener("resize", notifyRowSizes);
+    return () => window.removeEventListener("resize", notifyRowSizes);
+  }, [notifyRowSizes]);
+  useLayoutEffect(() => {
+    notifyRowSizes();
+  }, [linenupRef, notifyRowSizes, props.rowLayouts]);
 
   return (
     <div ref={linenupRef} className="list-view-lineup">
