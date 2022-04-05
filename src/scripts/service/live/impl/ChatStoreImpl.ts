@@ -1,4 +1,4 @@
-import { SetonlyCollection } from "@ncb/common";
+import { SetonlyCollection, Trigger } from "@ncb/common";
 import {
   UpdateVariation,
   NcbComment,
@@ -10,12 +10,16 @@ export class ChatStoreImpl implements ChatStore {
   comments = new SetonlyCollection<NcbComment>((comment) => comment.globalId);
   users = new SetonlyCollection<NcbUser>((user) => user.globalId);
 
+  readonly changeCommentNotice = new Trigger<[UpdateVariation]>();
+  readonly changeUserNotice = new Trigger<[UpdateVariation]>();
+
   public changeComments(variation: UpdateVariation, ...comments: NcbComment[]) {
     if (variation === "Add" || variation === "Update") {
       for (const comment of comments) {
         this.comments.set(comment);
       }
     }
+    this.changeCommentNotice.fire(variation);
   }
 
   public changeUsers(variation: UpdateVariation, ...users: NcbUser[]) {
@@ -24,5 +28,6 @@ export class ChatStoreImpl implements ChatStore {
         this.users.set(user);
       }
     }
+    this.changeUserNotice.fire(variation);
   }
 }

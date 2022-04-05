@@ -8,7 +8,6 @@ import { NiconamaLive } from "../livePlatform/niconama/NiconamaLive";
 import { ChatStore } from "./live/ChatStore";
 import { ChatStoreImpl } from "./live/impl/ChatStoreImpl";
 import { LiveManager } from "./live/impl/LiveManager";
-import { LiveNotify } from "./live/LiveNotify";
 import { LiveStore } from "./live/LiveStore";
 import { ChromeLocalStorage } from "./storage/impl/ChromeLocalStorage";
 import { LocalStorage } from "./storage/LocalStorage";
@@ -57,21 +56,17 @@ const getStorage: Provider<LocalStorage> = singleton(() => {
 });
 
 const getLiveManager: Provider<LiveManager> = singleton(() => {
-  const chatStore = getChatStore();
   const demoLive = new DemoLive();
   const niconama = new NiconamaLive();
-  return new LiveManager(chatStore, [demoLive, niconama]);
+  return new LiveManager([demoLive, niconama]);
 });
 
 const getLiveStore: Provider<LiveStore> = getLiveManager;
-
-const getChatNotify: Provider<LiveNotify> = getLiveManager;
 
 export const dep = {
   getChatStore,
   getStorage,
   getLiveStore,
-  getChatNotify,
 };
 
 getStorage();

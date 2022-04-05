@@ -1,4 +1,4 @@
-import { ReadonlyCollection } from "@ncb/common";
+import { ReadonlyCollection, SetOnlyTrigger } from "@ncb/common";
 import {
   UpdateVariation,
   NcbComment,
@@ -17,6 +17,17 @@ export interface ChatStore {
    * ユーザーのコレクション
    */
   readonly users: ReadonlyCollection<NcbUser>;
+
+  /**
+   * コメントが変化（追加・更新・削除）したことを通知する\
+   * 通知を送信する時点で`comment.globalUserId`のユーザーは`changeUsers`により通知されていることを保証する
+   */
+  readonly changeCommentNotice: SetOnlyTrigger<[UpdateVariation]>;
+
+  /**
+   * コメントをしたユーザーが変化（追加・更新・削除）したことを通知する
+   */
+  readonly changeUserNotice: SetOnlyTrigger<[UpdateVariation]>;
 
   /**
    * コメントを変更する

@@ -42,7 +42,7 @@ export function SendComment() {
       </Box>
       {liveStore.lives.map((live, i) => (
         <div key={live.livePlatformId} hidden={selectId !== i}>
-          {live.getViews().sendComment()}
+          {live.views.sendComment()}
         </div>
       ))}
     </>

@@ -22,24 +22,21 @@ export class DemoLive implements Live {
   public static readonly livePlatformName = "デモ配信サイト";
   readonly livePlatformId = DemoLive.livePlatformId;
   readonly livePlatformName = DemoLive.livePlatformName;
+
   /** { [globalId]: DemoUser } */
   #demoUsers: Record<string, DemoUser> = {};
   /** { [globalId]: DemoComment } */
   #demoComments: Record<string, DemoComment> = {};
-  readonly #updateLiveState = new Trigger<[LiveState]>();
-  readonly updateLiveState = this.#updateLiveState.asSetOnlyTrigger();
-  readonly #updateComments = new Trigger<[UpdateVariation, ...NcbComment[]]>();
-  readonly changeComments = this.#updateComments.asSetOnlyTrigger();
-  readonly #updateUsers = new Trigger<[UpdateVariation, ...NcbUser[]]>();
-  readonly changeUsers = this.#updateUsers.asSetOnlyTrigger();
-  readonly #onError = new Trigger<[LiveError]>();
-  readonly onError = this.#onError.asSetOnlyTrigger();
+  readonly updateLiveState = new Trigger<[LiveState]>();
+  readonly changeComments = new Trigger<[UpdateVariation, ...NcbComment[]]>();
+  readonly changeUsers = new Trigger<[UpdateVariation, ...NcbUser[]]>();
+  readonly onError = new Trigger<[LiveError]>();
   #connecting = false;
   #liveState?: LiveState;
-  #views: LiveViews;
+  readonly views: LiveViews;
 
   public constructor() {
-    this.#views = {
+    this.views = {
       connect: () => DemoLiveConnect({ demoLive: this }),
       sendComment: () => DemoLiveSendComment({ demoLive: this }),
     };
@@ -51,10 +48,6 @@ export class DemoLive implements Live {
 
   public get liveState() {
     return this.#liveState;
-  }
-
-  public getViews() {
-    return this.#views;
   }
 
   public newComments(plus: number): NcbComment[] {
@@ -72,8 +65,8 @@ export class DemoLive implements Live {
       }
       comments.push(toNcbComment(comment, user));
     }
-    if (users.length > 0) this.#updateUsers.fire("Add", ...users);
-    this.#updateComments.fire("Add", ...comments);
+    if (users.length > 0) this.changeUsers.fire("Add", ...users);
+    this.changeComments.fire("Add", ...comments);
     return comments;
   }
 }

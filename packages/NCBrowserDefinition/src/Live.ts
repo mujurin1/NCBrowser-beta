@@ -36,9 +36,9 @@ export interface Live extends LiveChatNotify {
   readonly liveState?: LiveState;
 
   /**
-   * 放送のビューを返す
+   * 放送のビュー
    */
-  readonly getViews: () => LiveViews;
+  readonly views: LiveViews;
 
   /**
    * 放送の状態が変更したことを通知する

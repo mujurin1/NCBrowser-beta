@@ -30,11 +30,7 @@ export class NiconamaLive implements Live {
   /** コメントの部屋 */
   #rooms: NiconamaCommentRoom[] = [];
 
-  readonly #updateLiveState = new Trigger<[LiveState]>();
-  readonly #updateComments = new Trigger<[UpdateVariation, ...NcbComment[]]>();
-  readonly #updateUsers = new Trigger<[UpdateVariation, ...NcbUser[]]>();
-  readonly #onError = new Trigger<[LiveError]>();
-  readonly #views: LiveViews;
+  readonly views: LiveViews;
 
   /** 接続しているか */
   get connecting(): boolean {
@@ -47,20 +43,16 @@ export class NiconamaLive implements Live {
   readonly livePlatformId = NiconamaLive.id;
   readonly livePlatformName = NiconamaLive.platformName;
 
-  readonly updateLiveState = this.#updateLiveState.asSetOnlyTrigger();
-  readonly changeComments = this.#updateComments.asSetOnlyTrigger();
-  readonly changeUsers = this.#updateUsers.asSetOnlyTrigger();
-  readonly onError = this.#onError.asSetOnlyTrigger();
+  readonly updateLiveState = new Trigger<[LiveState]>();
+  readonly changeComments = new Trigger<[UpdateVariation, ...NcbComment[]]>();
+  readonly changeUsers = new Trigger<[UpdateVariation, ...NcbUser[]]>();
+  readonly onError = new Trigger<[LiveError]>();
 
   public constructor() {
-    this.#views = {
+    this.views = {
       sendComment: () => NiconamaSendComment({ niconama: this }),
       connect: () => NiconamaConnect({ niconama: this }),
     };
-  }
-
-  getViews() {
-    return this.#views;
   }
 
   /**
@@ -78,7 +70,7 @@ export class NiconamaLive implements Live {
       },
     });
     if (meta.status !== 200) {
-      this.#onError.fire({
+      this.onError.fire({
         livePlatformId: this.livePlatformId,
         errorMessage:
           meta.errorMessage ?? `${meta.status}:放送IDまたはトークンが不正です`,
@@ -140,8 +132,8 @@ export class NiconamaLive implements Live {
       }
       comments.push(toNcbComment(comment, user));
     }
-    if (users.length > 0) this.#updateUsers.fire("Add", ...users);
-    this.#updateComments.fire("Add", ...comments);
+    if (users.length > 0) this.changeUsers.fire("Add", ...users);
+    this.changeComments.fire("Add", ...comments);
   }
 }
 

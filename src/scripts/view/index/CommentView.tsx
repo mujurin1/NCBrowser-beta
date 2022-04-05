@@ -1,6 +1,6 @@
 import { assertNotNullish } from "@ncb/common";
-import { NcbComment, UpdateVariation } from "@ncb/ncbrowser-definition";
-import React, { useEffect } from "react";
+import { UpdateVariation } from "@ncb/ncbrowser-definition";
+import { useEffect } from "react";
 import { dep } from "../../service/dep";
 import {
   RowRenderProps,
@@ -14,16 +14,11 @@ export interface CommentViewProps {
 
 export function CommentView(props: CommentViewProps) {
   const chatStore = dep.getChatStore();
-  const chatNotify = dep.getChatNotify();
 
   const layoutManager = props.layoutManager;
 
   useEffect(() => {
-    const handler = (
-      livePlatformId: string,
-      variation: UpdateVariation,
-      ...updateComments: NcbComment[] // eslint-disable-line @typescript-eslint/no-unused-vars
-    ) => {
+    const handler = (variation: UpdateVariation) => {
       if (variation === "Add") {
         layoutManager.setRowCount(chatStore.comments.length);
       } else if (variation === "Delete" || variation === "Update") {
@@ -32,9 +27,9 @@ export function CommentView(props: CommentViewProps) {
         );
       }
     };
-    chatNotify.changeComments.add(handler);
-    return () => chatNotify.changeComments.delete(handler);
-  }, [chatNotify.changeComments, chatStore.comments, layoutManager]);
+    chatStore.changeCommentNotice.add(handler);
+    return () => chatStore.changeCommentNotice.delete(handler);
+  }, [chatStore.changeCommentNotice, chatStore.comments, layoutManager]);
 
   return <VirtualListView layoutManager={layoutManager} rowRender={Row} />;
 }

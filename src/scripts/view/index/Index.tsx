@@ -10,14 +10,14 @@ import { Connection } from "./Connection";
 import { SendComment } from "./SendComment";
 
 export function IndexComponent() {
-  const liveManager = dep.getChatNotify();
+  const liveStore = dep.getLiveStore();
   const [errors, setErrors] = useState<LiveError[]>([]);
 
   useEffect(() => {
     const fn = (error: LiveError) => setErrors([...errors, error]);
-    liveManager.onError.add(fn);
-    return () => liveManager.onError.delete(fn);
-  }, [liveManager, errors]);
+    liveStore.onError.add(fn);
+    return () => liveStore.onError.delete(fn);
+  }, [liveStore, errors]);
 
   const layoutManager = useMemo(() => new VirtualListLayoutManager(20, 0), []);
 

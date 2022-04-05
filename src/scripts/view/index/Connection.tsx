@@ -42,7 +42,7 @@ export function Connection() {
             padding: 16px 32px;
           `}
         >
-          {live.getViews().connect()}
+          {live.views.connect()}
         </div>
       ))}
     </>
