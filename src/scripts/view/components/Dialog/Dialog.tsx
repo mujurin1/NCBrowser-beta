@@ -68,7 +68,7 @@ export function Dialog(props: Props) {
   );
 
   const onDialogBaseAnimationEnd = useCallback((ev: React.AnimationEvent) => {
-    // DropShadowへクリックイベントが伝搬するのを防ぎ、ダイアログが閉じないようにする
+    // DropShadowへAnimationEndイベントが伝搬するのを防ぎ意図せず状態が遷移するのを防ぐ
     ev.stopPropagation();
   }, []);
 
