@@ -13,8 +13,12 @@ import {
   NiconamaCommentRoom,
   NiconamaGetUnamaProgramsRooms,
   NiconamaChat,
+  setNiconamaApiUseToken,
+  GetNicoTokenUrl,
+  checkTokenRefresh,
 } from "@ncb/niconama-api";
 import { nanoid } from "nanoid";
+import { dep } from "../../service/dep";
 import { NiconamaComment } from "./NiconamaComment";
 import { NiconamaConnect } from "./NiconamaConnect";
 import { NiconamaSendComment } from "./NiconamaSendComment";
@@ -53,6 +57,29 @@ export class NiconamaLive implements Live {
       sendComment: () => NiconamaSendComment({ niconama: this }),
       connect: () => NiconamaConnect({ niconama: this }),
     };
+
+    this.initNiconamaApi();
+  }
+
+  private initNiconamaApi() {
+    const storage = dep.getStorage();
+    // トークン取得ラムダ
+    setNiconamaApiUseToken(() => {
+      const token = storage.data.nico.token?.access_token;
+      if (token == null) throw new Error("トークンが存在しません");
+      return token;
+    });
+    // トークン有効性のチェック
+    void storage.load().then(() => {
+      if (storage.data.nico?.token?.access_token == null) {
+        window.open(GetNicoTokenUrl, "get_nico_oauth");
+      } else {
+        void checkTokenRefresh(storage.data.nico.token).then(async (token) => {
+          storage.data.nico.token = token;
+          await storage.save();
+        });
+      }
+    });
   }
 
   /**

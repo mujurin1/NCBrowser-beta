@@ -1,7 +1,7 @@
 import {
   checkTokenRefresh,
   GetNicoTokenUrl,
-  setNicoApiUseToken,
+  setNiconamaApiUseToken,
 } from "@ncb/niconama-api";
 import { DemoLive } from "../livePlatform/__demo__/DemoLive";
 import { NiconamaLive } from "../livePlatform/niconama/NiconamaLive";
@@ -30,7 +30,7 @@ const getStorage: Provider<LocalStorage> = singleton(() => {
 
   // トークンのセット
   function setNiconamaToken() {
-    setNicoApiUseToken(() => {
+    setNiconamaApiUseToken(() => {
       const token = dep.getStorage().data.nico.token?.access_token;
       if (token == null) throw new Error("トークンが存在しません");
       return token;

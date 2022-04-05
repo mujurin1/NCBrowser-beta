@@ -19,7 +19,7 @@ export async function checkTokenRefresh(
  * ニコ生API OAuth Tokenを取得する関数\
  * APIを利用する前にセットしてください
  */
-export function setNicoApiUseToken(fn: () => string) {
+export function setNiconamaApiUseToken(fn: () => string) {
   getNicoApiUseToken.get = fn;
 }
 
@@ -35,8 +35,9 @@ export function assertNiconamaResponse(
   const { meta, data } = body;
   if (meta.status === 200) return;
   throw new Error(
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     `Error: ${name}\nstatus: ${meta.status}. code: ${meta.errorCode}\n` +
-      `Message: ${meta.errorMessage}\n` +
+      `Message: ${meta.errorMessage ?? ""}\n` +
       `data:\n${JSON.stringify(data)}`
   );
 }
@@ -50,7 +51,7 @@ export interface NiconamaApiResponseBody {
   /** レスポンスステータス情報 */
   meta: NiconamaApiResponseMeta;
   /** HTTPレスポンス同様のペイロード */
-  data?: any;
+  data?: unknown;
 }
 
 /**

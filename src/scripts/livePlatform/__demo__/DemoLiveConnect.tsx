@@ -10,16 +10,11 @@ export function DemoLiveConnect(props: DemoLiveConnectProps) {
   const { demoLive } = props;
 
   const [state, setState] = useState(0);
-  const [timer, setTimer] = useState<NodeJS.Timeout>();
 
-  const autoComment = useCallback(() => {
-    if (timer == null) {
-      setTimer(setInterval(() => demoLive.newComments(1), 500));
-    } else {
-      clearInterval(timer);
-      setTimer(undefined);
-    }
-  }, [demoLive, timer]);
+  const autoComment = useCallback(
+    () => demoLive.switchAutoComment(),
+    [demoLive]
+  );
 
   return (
     <>

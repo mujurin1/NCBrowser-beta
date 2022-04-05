@@ -23,6 +23,8 @@ export class DemoLive implements Live {
   readonly livePlatformId = DemoLive.livePlatformId;
   readonly livePlatformName = DemoLive.livePlatformName;
 
+  private createCommentIntervalId?: NodeJS.Timer;
+
   /** { [globalId]: DemoUser } */
   #demoUsers: Record<string, DemoUser> = {};
   /** { [globalId]: DemoComment } */
@@ -48,6 +50,17 @@ export class DemoLive implements Live {
 
   public get liveState() {
     return this.#liveState;
+  }
+
+  public switchAutoComment() {
+    if (this.createCommentIntervalId == null) {
+      this.createCommentIntervalId = setInterval(() => {
+        this.newComments(1);
+      }, 500);
+    } else {
+      clearInterval(this.createCommentIntervalId);
+      this.createCommentIntervalId = undefined;
+    }
   }
 
   public newComments(plus: number): NcbComment[] {
