@@ -5,6 +5,10 @@
 
 ## 開発時の起動方法
 1. パッケージをインストールする `npm ci`
+   * もし先に`npm install`した場合は以下を実行して最初から
+     ```
+     git reset --hard HEAD
+     ```
 2. ビルドする `npm run dev`\
    （トップディレクトリに`dist`フォルダが作成される）
 3. Chromeで`chrome://extensions/`にアクセスする
