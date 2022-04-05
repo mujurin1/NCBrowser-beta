@@ -28,11 +28,11 @@ export function Dialog(props: Props) {
   useEffect(() => {
     if (open) {
       setAnimationState((oldState) =>
-        oldState === "closed" ? "opening" : oldState
+        oldState === "opened" ? "opened" : "opening"
       );
     } else {
       setAnimationState((oldState) =>
-        oldState === "opened" ? "closing" : oldState
+        oldState === "closed" ? "closed" : "closing"
       );
     }
   }, [open]);
@@ -52,10 +52,11 @@ export function Dialog(props: Props) {
 
   const onDropShadowClick = useCallback(
     (ev: React.MouseEvent) => {
+      if (animationState !== "opened") return;
       ev.stopPropagation();
       onClose?.();
     },
-    [onClose]
+    [animationState, onClose]
   );
 
   const onDropShadowKeyDown = useCallback(
