@@ -1,7 +1,9 @@
 import { css } from "@emotion/react";
+import Button from "@mui/material/Button";
 import { LiveError } from "@ncb/ncbrowser-definition";
 import React, { useEffect, useMemo, useState } from "react";
 import { dep } from "../../service/dep";
+import { Dialog } from "../components/Dialog/Dialog";
 import { VirtualListLayoutManager } from "../components/VirtualList/VirtualListLayoutManager";
 import { CommentView } from "./CommentView";
 import { Connection } from "./Connection";
@@ -19,36 +21,42 @@ export function IndexComponent() {
 
   const layoutManager = useMemo(() => new VirtualListLayoutManager(20, 0), []);
 
+  const [isConnectionDialogOpen, setIsConnectionDialogOpen] = useState(false);
+
   return (
     <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        display: "flex",
-        flexDirection: "column",
-      }}
+      css={css`
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      `}
     >
       <div
-        style={{
-          backgroundColor: "cyan",
-          width: "100%",
-          flex: "0 0 60px",
-        }}
+        css={css`
+          background: cyan;
+          flex: 0 0 60px;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 32px;
+        `}
       >
-        ヘッダービュー
-        <br />
-        {`${errors.at(-1)?.livePlatformId ?? "(undefined)"}\n${
-          errors.at(-1)?.errorMessage ?? "(undefined)"
-        }`}
-      </div>
-      <div
-        style={{
-          backgroundColor: "salmon",
-          width: "100%",
-          flex: "0 0 100px",
-        }}
-      >
-        <Connection />
+        <div>
+          ヘッダービュー
+          <br />
+          {`${errors.at(-1)?.livePlatformId ?? "(undefined)"}\n${
+            errors.at(-1)?.errorMessage ?? "(undefined)"
+          }`}
+        </div>
+        <Button
+          onClick={() => setIsConnectionDialogOpen(true)}
+          variant="contained"
+        >
+          接続
+        </Button>
       </div>
       <div
         style={{
@@ -68,6 +76,12 @@ export function IndexComponent() {
       >
         <SendComment />
       </div>
+      <Dialog
+        open={isConnectionDialogOpen}
+        onClose={() => setIsConnectionDialogOpen(false)}
+      >
+        <Connection />
+      </Dialog>
     </div>
   );
 }
