@@ -1,11 +1,7 @@
-import { Box, Tabs, Tab } from "@mui/material";
+import { css } from "@emotion/react";
+import { Box, Tab, Tabs } from "@mui/material";
 import React, { useCallback, useMemo, useState } from "react";
 import { dep } from "../../service/dep";
-
-const tabStyle = {
-  minHeight: "30px",
-  height: "30px",
-};
 
 /**
  * 放送に接続するためのビュー
@@ -22,11 +18,7 @@ export function Connection() {
   const liveTabs = useMemo(
     () =>
       liveStore.lives.map((live) => (
-        <Tab
-          key={live.livePlatformId}
-          sx={tabStyle}
-          label={live.livePlatformName}
-        />
+        <Tab key={live.livePlatformId} label={live.livePlatformName} />
       )),
     [liveStore.lives]
   );
@@ -35,7 +27,6 @@ export function Connection() {
     <>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
-          sx={tabStyle}
           value={selectId}
           onChange={changeTab}
           aria-label="basic tabs example"
@@ -44,7 +35,13 @@ export function Connection() {
         </Tabs>
       </Box>
       {liveStore.lives.map((live, i) => (
-        <div key={live.livePlatformId} hidden={selectId !== i}>
+        <div
+          key={live.livePlatformId}
+          hidden={selectId !== i}
+          css={css`
+            padding: 16px 32px;
+          `}
+        >
           {live.getViews().connect()}
         </div>
       ))}
