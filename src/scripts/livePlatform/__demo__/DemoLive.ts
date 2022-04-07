@@ -86,20 +86,20 @@ export class DemoLive implements Live {
 
 let demoComments = 0;
 const demoUsers = [
-  { id: "1", name: "デモ　Ａ" },
+  { id: "1", name: "デモ AAAAAA" },
   {
     id: "2",
-    name: "デモ　Ｂ",
+    name: "デモ BB",
   },
   {
     id: "3",
-    name: "デモ　Ｃ",
+    name: "デモ C",
   },
   {
     id: "4",
-    name: "デモ　Ｄ",
+    name: "デモ DDDDD",
   },
-  { id: "5", name: "デモ　Ｅ" },
+  { id: "5", name: "デモ EEEEEEEEEEEE" },
 ];
 const randomUser = () =>
   demoUsers[Math.floor(Math.random() * demoUsers.length)];
