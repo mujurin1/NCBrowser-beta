@@ -129,7 +129,7 @@ function _Lineup(props: LineupProps) {
     <div ref={linenupRef} className="list-view-lineup">
       {props.rowLayouts.map((rowLayout) => {
         if (rowLayout.itemLayout.index === -1)
-          return <div key={rowLayout.key} style={{ visibility: "hidden" }} />;
+          return <div key={rowLayout.key} className="list-view-row-hidden" />;
         else return props.rowRender({ rowLayout });
       })}
     </div>
