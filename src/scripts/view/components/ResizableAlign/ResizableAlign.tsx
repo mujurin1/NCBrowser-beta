@@ -12,7 +12,6 @@ export interface ResizableAlignProps {
   cssString?: string;
   /** 幅が変わった時に呼ばれる */
   onResize: (widths: number[], index: number) => void;
-  /** TODO:２回目以降にこの値を変えて呼び出しても問題ないかテストする */
   /** カラムの幅 */
   defaultWidths: number[];
   /** 各カラムの最小幅 */
@@ -21,9 +20,14 @@ export interface ResizableAlignProps {
   flexIndex: number;
   /** ヘッダーの高さ */
   height: number;
-  /** ヘッダーの幅 */
+  /**
+   * ヘッダーの幅\
+   * "auto"なら動的
+   */
   width: number;
 }
+
+const partitionSize = 3;
 
 export function ResizableAlign(props: ResizableAlignProps) {
   const defaultWidths = useMemo(
@@ -59,9 +63,7 @@ export function ResizableAlign(props: ResizableAlignProps) {
       /** 幅の変化量 */
       let amount = clientX - temp.startX;
       if (amount === 0) return false;
-      if (!temp.left) {
-        amount *= -1;
-      }
+      if (!temp.left) amount *= -1;
 
       widths[temp.index] = temp.startTargetWidth + amount;
       widths[flexIndex] = temp.startFlexWidth - amount;
@@ -145,7 +147,7 @@ export function ResizableAlign(props: ResizableAlignProps) {
             position: absolute;
             top: 0;
             right: 0;
-            width: 3px;
+            width: ${partitionSize}px;
             height: 100%;
             background-color: blue;
             cursor: col-resize;

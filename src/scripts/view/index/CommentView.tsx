@@ -1,7 +1,13 @@
 import { css } from "@emotion/react";
 import { assertNotNullish, Trigger } from "@ncb/common";
 import { UpdateVariation } from "@ncb/ncbrowser-definition";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import { dep } from "../../service/dep";
 import { ResizableAlign } from "../components/ResizableAlign/ResizableAlign";
 import {
@@ -17,13 +23,13 @@ export function CommentView() {
 
   const columnsMinWidth = useMemo(() => [30, 30, 30, 53, 30], []);
   const [columnsWidth, setColumnsWidth] = useState([60, 40, 60, 60, 0]);
+  const [headerWidth, setHeaderWidth] = useState(800);
 
   const changeColumnWidth = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (widths: number[], index: number) => {
       setColumnsWidth(widths);
       refreshRowHeight.fire();
-      // layoutManager.
     },
     [refreshRowHeight]
   );
@@ -42,6 +48,28 @@ export function CommentView() {
     return () => chatStore.changeCommentNotice.delete(handler);
   }, [chatStore.changeCommentNotice, chatStore.comments, layoutManager]);
 
+  const notifyRowSizes = useCallback(() => {
+    setHeaderWidth(window.innerWidth);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("resize", notifyRowSizes);
+    return () => window.removeEventListener("resize", notifyRowSizes);
+  }, [notifyRowSizes]);
+
+  useLayoutEffect(() => notifyRowSizes(), [notifyRowSizes]);
+
+  const columCss = useMemo(
+    () =>
+      css`
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      `,
+    []
+  );
+
   return (
     <div
       css={css`
@@ -56,18 +84,29 @@ export function CommentView() {
         flexIndex={4}
         onResize={changeColumnWidth}
         height={40}
-        width={800}
+        width={headerWidth}
         cssString={`
+          width: 100%;
           background-color: #c8aef2;
           flex: none;
         `}
       >
         {[
-          <div key="A">コメ版</div>,
-          <div key="B">アイコン</div>,
-          <div key="C">ユーザー名</div>,
-          <div key="D">時間</div>,
-          <div key="E">コメント</div>,
+          <div key="A" css={columCss}>
+            コメ番
+          </div>,
+          <div key="B" css={columCss}>
+            アイコン
+          </div>,
+          <div key="C" css={columCss}>
+            ユーザー名
+          </div>,
+          <div key="D" css={columCss}>
+            時間
+          </div>,
+          <div key="E" css={columCss}>
+            コメント
+          </div>,
         ]}
       </ResizableAlign>
       <div

@@ -55,8 +55,8 @@ export class DemoLive implements Live {
   public switchAutoComment() {
     if (this.createCommentIntervalId == null) {
       this.createCommentIntervalId = setInterval(() => {
-        this.newComments(1);
-      }, 500);
+        this.newComments(10);
+      }, 20);
     } else {
       clearInterval(this.createCommentIntervalId);
       this.createCommentIntervalId = undefined;
