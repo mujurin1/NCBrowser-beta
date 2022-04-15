@@ -4,6 +4,7 @@ import React, {
   useRef,
   useCallback,
   useEffect,
+  useMemo,
 } from "react";
 import {
   RowLayout,
@@ -11,7 +12,7 @@ import {
 } from "./VirtualListLayoutManager";
 
 import "./style.css";
-import { Fn } from "@ncb/common";
+import { Fn, SetOnlyTrigger } from "@ncb/common";
 
 export interface RowRenderProps {
   /** 表示する行のレイアウト */
@@ -21,10 +22,15 @@ export interface RowRenderProps {
 export interface VirtualListViewProps {
   layoutManager: VirtualListLayoutManager;
   rowRender: Fn<[RowRenderProps], JSX.Element>;
+  /** 行の高さを再計算したい時に呼び出す */
+  refreshRowHeight: SetOnlyTrigger<[]>;
 }
 
 export function VirtualListView(props: VirtualListViewProps) {
-  const layoutManager = props.layoutManager;
+  const layoutManager = useMemo(
+    () => props.layoutManager,
+    [props.layoutManager]
+  );
 
   const [layout, setLayout] = useState(layoutManager.listViewLayout);
 
@@ -83,6 +89,7 @@ export function VirtualListView(props: VirtualListViewProps) {
         layoutManager={layoutManager}
         rowLayouts={layout.rowLayouts}
         rowRender={props.rowRender}
+        refreshRowHeight={props.refreshRowHeight}
       />
     </div>
   );
@@ -92,6 +99,8 @@ interface LineupProps {
   layoutManager: VirtualListLayoutManager;
   rowLayouts: RowLayout[];
   rowRender: Fn<[RowRenderProps], JSX.Element>;
+  /** 行の高さを再計算したい時に呼び出す */
+  refreshRowHeight: SetOnlyTrigger<[]>;
 }
 
 function _Lineup(props: LineupProps) {
@@ -118,9 +127,13 @@ function _Lineup(props: LineupProps) {
   }, [layoutManager, linenupRef]);
 
   useEffect(() => {
+    props.refreshRowHeight.add(notifyRowSizes);
     window.addEventListener("resize", notifyRowSizes);
-    return () => window.removeEventListener("resize", notifyRowSizes);
-  }, [notifyRowSizes]);
+    return () => {
+      window.removeEventListener("resize", notifyRowSizes);
+      props.refreshRowHeight.delete(notifyRowSizes);
+    };
+  }, [notifyRowSizes, props.refreshRowHeight]);
   useLayoutEffect(() => {
     notifyRowSizes();
   }, [linenupRef, notifyRowSizes, props.rowLayouts]);

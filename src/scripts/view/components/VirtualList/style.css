@@ -34,39 +34,3 @@
   position: absolute;
   visibility: hidden;
 }
-
-/* 各列のアイテム */
-.list-view-row-no {
-  width: 60px;
-  text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.list-view-row-icon {
-  width: 50px;
-  padding: 0;
-}
-.list-view-row-name {
-  width: 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: left;
-}
-.list-view-row-time {
-  width: 50px;
-  text-align: center;
-}
-.list-view-row-comment {
-  width: 100px;
-  flex-grow: 1;
-  height: auto;
-  min-width: 55px;
-}
-
-/* アイコン画像 */
-.list-view-row-icon > img {
-  width: 100%;
-  height: auto;
-}

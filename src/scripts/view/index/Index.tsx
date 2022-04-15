@@ -1,10 +1,9 @@
 import { css } from "@emotion/react";
 import Button from "@mui/material/Button";
 import { LiveError } from "@ncb/ncbrowser-definition";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { dep } from "../../service/dep";
 import { Dialog } from "../components/Dialog/Dialog";
-import { VirtualListLayoutManager } from "../components/VirtualList/VirtualListLayoutManager";
 import { CommentView } from "./CommentView";
 import { Connection } from "./Connection";
 import { SendComment } from "./SendComment";
@@ -18,8 +17,6 @@ export function IndexComponent() {
     liveStore.onError.add(fn);
     return () => liveStore.onError.delete(fn);
   }, [liveStore, errors]);
-
-  const layoutManager = useMemo(() => new VirtualListLayoutManager(20, 0), []);
 
   const [isConnectionDialogOpen, setIsConnectionDialogOpen] = useState(false);
 
@@ -59,13 +56,13 @@ export function IndexComponent() {
         </Button>
       </div>
       <div
-        style={{
-          backgroundColor: "chocolate",
-          width: "100%",
-          flex: "1 1 0",
-        }}
+        css={css`
+          background-color: chocolate;
+          width: 100%;
+          flex: 1 1 0;
+        `}
       >
-        <CommentView layoutManager={layoutManager} />
+        <CommentView />
       </div>
       <div
         css={css`
