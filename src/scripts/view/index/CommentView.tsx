@@ -167,7 +167,9 @@ function Row(widths: number[]) {
         {RowTime(content.time, widths[3])}
         <div
           css={css`
-            width: ${widths[4]}px;
+            width: ${
+              0 /*widths[4] スクロールバー出現時の幅をフレックスなカラムで無理やり*/
+            }px;
             flex-grow: 1;
             height: auto;
             min-width: 55px;

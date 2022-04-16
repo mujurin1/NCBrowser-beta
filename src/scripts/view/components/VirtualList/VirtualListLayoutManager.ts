@@ -183,8 +183,10 @@ export class VirtualListLayoutManager {
     let changeMinIndex = Number.MAX_SAFE_INTEGER;
     let changeMaxIndex = Number.MIN_SAFE_INTEGER;
     // アイテムの新しい高さを設定する
-    for (const [index, height] of array) {
-      if (height < this.#minHeight) continue;
+    for (const value of array) {
+      const index = value[0];
+      let height = value[1];
+      if (height < this.#minHeight) height = this.#minHeight;
       const layout = this.#itemLayouts[index];
       const dif = height - layout.style.minHeight;
       if (dif === 0) continue;
