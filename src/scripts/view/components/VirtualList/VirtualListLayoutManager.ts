@@ -103,8 +103,15 @@ export class VirtualListLayoutManager {
 
     this.#viewportHeight = height;
 
-    this.#scrollTop -= dif;
-    if (this.#scrollTop < 0) this.#scrollTop = 0;
+    const minScrollTop = 0;
+    const maxScrollTop = Math.max(
+      this.#listViewLayout.scrollHeight - height,
+      0
+    );
+    this.#scrollTop = Math.min(
+      Math.max(minScrollTop, this.#scrollTop - dif),
+      maxScrollTop
+    );
 
     this.recomputeListViewLayout(false, this.#autoScroll);
 
