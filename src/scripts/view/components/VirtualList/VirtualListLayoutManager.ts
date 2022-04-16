@@ -75,17 +75,12 @@ export class VirtualListLayoutManager {
     this.#minHeight = minRowHeight;
     this.#itemLayouts = createItemLayouts(itemCount, this.#minHeight);
     this.#listViewLayout = {
-      scrollHeight: 0,
-      visibleRowCount: 1,
-      rowLayouts: [
-        {
-          key: "0",
-          itemLayout: { index: -10, style: { minHeight: -10, top: -10 } },
-        },
-      ],
+      scrollHeight: itemCount * minRowHeight,
+      visibleRowCount: 0,
+      rowLayouts: [],
     };
-
-    this.recomputeListViewLayout(true, this.#autoScroll);
+    this.#autoScroll =
+      itemCount * minRowHeight - this.#viewportHeight <= this.#scrollTop;
   }
 
   /** スクロール位置 */
