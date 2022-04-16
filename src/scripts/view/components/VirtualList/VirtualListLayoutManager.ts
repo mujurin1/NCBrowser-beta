@@ -129,6 +129,13 @@ export class VirtualListLayoutManager {
    * @param top スクロール座標
    */
   public setScrollPosition(top: number): void {
+    const minScrollTop = 0;
+    const maxScrollTop = Math.max(
+      this.#listViewLayout.scrollHeight - this.#viewportHeight,
+      0
+    );
+    top = Math.min(Math.max(minScrollTop, top), maxScrollTop);
+
     // （現状最適だが不具合のある）プログラムかユーザーかどっちのスクロールか判定する分岐
     // true ならプログラム
     if (top === this.#scrollTop) return;
