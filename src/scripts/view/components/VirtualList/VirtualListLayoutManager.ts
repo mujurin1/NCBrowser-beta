@@ -75,17 +75,12 @@ export class VirtualListLayoutManager {
     this.#minHeight = minRowHeight;
     this.#itemLayouts = createItemLayouts(itemCount, this.#minHeight);
     this.#listViewLayout = {
-      scrollHeight: 0,
-      visibleRowCount: 1,
-      rowLayouts: [
-        {
-          key: "0",
-          itemLayout: { index: -10, style: { minHeight: -10, top: -10 } },
-        },
-      ],
+      scrollHeight: itemCount * minRowHeight,
+      visibleRowCount: 0,
+      rowLayouts: [],
     };
-
-    this.recomputeListViewLayout(true, this.#autoScroll);
+    this.#autoScroll =
+      itemCount * minRowHeight - this.#viewportHeight <= this.#scrollTop;
   }
 
   /** スクロール位置 */
@@ -108,8 +103,15 @@ export class VirtualListLayoutManager {
 
     this.#viewportHeight = height;
 
-    this.#scrollTop -= dif;
-    if (this.#scrollTop < 0) this.#scrollTop = 0;
+    const minScrollTop = 0;
+    const maxScrollTop = Math.max(
+      this.#listViewLayout.scrollHeight - height,
+      0
+    );
+    this.#scrollTop = Math.min(
+      Math.max(minScrollTop, this.#scrollTop - dif),
+      maxScrollTop
+    );
 
     this.recomputeListViewLayout(false, this.#autoScroll);
 
@@ -127,6 +129,13 @@ export class VirtualListLayoutManager {
    * @param top スクロール座標
    */
   public setScrollPosition(top: number): void {
+    const minScrollTop = 0;
+    const maxScrollTop = Math.max(
+      this.#listViewLayout.scrollHeight - this.#viewportHeight,
+      0
+    );
+    top = Math.min(Math.max(minScrollTop, top), maxScrollTop);
+
     // （現状最適だが不具合のある）プログラムかユーザーかどっちのスクロールか判定する分岐
     // true ならプログラム
     if (top === this.#scrollTop) return;
@@ -161,6 +170,15 @@ export class VirtualListLayoutManager {
     if (this.#autoScroll) {
       this.#scrollTop += plus * this.#minHeight;
     }
+    const newScrollHeight =
+      this.#listViewLayout.scrollHeight + plus * this.#minHeight;
+    const minScrollTop = 0;
+    const maxScrollTop = Math.max(newScrollHeight - this.#viewportHeight, 0);
+    this.#scrollTop = Math.min(
+      Math.max(minScrollTop, this.#scrollTop),
+      maxScrollTop
+    );
+
     this.recomputeListViewLayout(true, this.#autoScroll);
   }
 

@@ -18,3 +18,5 @@ dist/*
 
 # IntelliJ Idea 設定ファイル
 .idea
+
+coverage
